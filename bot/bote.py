@@ -30,7 +30,6 @@ async def process_help_command(message: types.Message):
 @dp.message_handler()
 async def echo(message):
     control_user(message.from_user)
-    it_user = get_user(message.from_user.id)
     mess = get_mess(message.from_user.id)
     if message.content_type == ContentType.PHOTO:
         mess.add_image()
@@ -44,4 +43,5 @@ async def echo(message):
         mess.add_gifes()
     else:
         mess.add_texts()
+    # it_user = get_user(message.from_user.id)
     # await message.answer(it_user.born.strftime("%m/%d/%Y, %H:%M:%S"))
