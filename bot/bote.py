@@ -16,6 +16,17 @@ bot = Bot(token=settings.TOKEN)
 dp = Dispatcher(bot)
 
 
+@dp.message_handler(commands=['help'])
+async def process_help_command(message: types.Message):
+    await message.reply(bot_texts.help)
+
+
+@dp.message_handler(commands=['stat'])
+async def process_help_command(message: types.Message):
+    text = get_stat(message.from_user.id)
+    await message.reply(text)
+
+
 @dp.message_handler()
 async def echo(message: types.Message):
     control_user(message.from_user)
@@ -34,14 +45,3 @@ async def echo(message: types.Message):
     else:
         mess.add_texts()
     # await message.answer(it_user.born.strftime("%m/%d/%Y, %H:%M:%S"))
-
-
-@dp.message_handler(commands=['help'])
-async def process_help_command(message: types.Message):
-    await message.answer(bot_texts.help)
-
-
-@dp.message_handler(commands=['stat'])
-async def process_help_command(message: types.Message):
-    text = get_stat(message.from_user.id)
-    await message.answer(text)
