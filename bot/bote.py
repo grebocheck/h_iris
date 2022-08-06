@@ -38,10 +38,10 @@ async def echo(message: types.Message):
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    await message.reply(bot_texts.help)
+    await message.answer(bot_texts.help)
 
 
 @dp.message_handler(commands=['stat'])
 async def process_help_command(message: types.Message):
     text = get_stat(message.from_user.id)
-    await message.reply(text)
+    await message.answer(text)
