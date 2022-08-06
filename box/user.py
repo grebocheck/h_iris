@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData, update, delete
 from sqlalchemy.sql import select
 from datetime import datetime
 
-from db import user, engine, meta
+from box.db import user, engine, meta
 from loge import log
 
 

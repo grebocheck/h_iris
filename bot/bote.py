@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, types
 
 from bot import bot_texts
 import settings
-from box.user import User, control_user, get_user
+from box.user import control_user, get_user
 
 # Configure logging
 

@@ -1,5 +1,4 @@
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Boolean
-from loge import log
 
 # engine = create_engine('sqlite:///bot.db', echo=True)
 engine = create_engine('postgresql://xgexgdchfrlixs:155d3de4c7fce0638ea27d3908184c6139c606b695debe01ea7cad6041fcf119'
@@ -52,4 +51,3 @@ rep = Table(
 
 if __name__ == '__main__':
     meta.create_all(engine)
-    log("Запущено db.py в режимі main")
