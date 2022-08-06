@@ -33,7 +33,7 @@ async def echo(message: types.Message):
         mess.add_gifes()
     else:
         mess.add_texts()
-    await message.answer(it_user.born.strftime("%m/%d/%Y, %H:%M:%S"))
+    # await message.answer(it_user.born.strftime("%m/%d/%Y, %H:%M:%S"))
 
 
 @dp.message_handler(commands=['help'])
