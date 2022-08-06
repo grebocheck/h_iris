@@ -28,7 +28,7 @@ async def process_help_command(message: types.Message):
 
 
 @dp.message_handler()
-async def echo(message: types.Message):
+async def echo(message):
     control_user(message.from_user)
     it_user = get_user(message.from_user.id)
     mess = get_mess(message.from_user.id)

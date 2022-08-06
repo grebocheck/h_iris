@@ -22,7 +22,7 @@ audio: {it_mess.audio}
 image: {it_mess.image}
 video: {it_mess.video}
 stick: {it_mess.stick}
-stick: {it_mess.gifes}"""
+gifes: {it_mess.gifes}"""
     return text
 
 
