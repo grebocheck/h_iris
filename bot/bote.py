@@ -36,8 +36,6 @@ async def process_help_command(message: types.Message):
 async def echo(message):
     control_user(message.from_user)
     mess = get_mess(message.from_user.id)
-    print(message.content_type)
-    print(ContentType.PHOTO)
     if message.content_type == ContentType.PHOTO:
         mess.add_image()
     elif message.content_type == ContentType.VOICE:
