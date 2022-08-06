@@ -27,7 +27,8 @@ async def process_help_command(message: types.Message):
     await message.reply(text)
 
 
-@dp.message_handler()
+@dp.message_handler(
+    content_types=ContentType.PHOTO | ContentType.VOICE | ContentType.VIDEO | ContentType.STICKER | ContentType.ANIMATION | ContentType.TEXT)
 async def echo(message):
     control_user(message.from_user)
     mess = get_mess(message.from_user.id)
