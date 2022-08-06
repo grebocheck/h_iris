@@ -3,7 +3,6 @@ from sqlalchemy.sql import select
 from datetime import datetime
 
 from box.db import user, engine, meta
-from loge import log
 
 
 # імпорт користувача з бази данних по user_id

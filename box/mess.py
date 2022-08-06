@@ -3,7 +3,6 @@ from sqlalchemy.sql import select
 from datetime import datetime
 
 from box.db import mess, engine, meta
-from loge import log
 
 
 class Mess:
