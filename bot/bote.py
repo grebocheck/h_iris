@@ -17,7 +17,7 @@ dp = Dispatcher(bot)
 
 
 @dp.message_handler()
-async def echo(message):
+async def echo(message: types.Message):
     control_user(message.from_user)
     it_user = get_user(message.from_user.id)
     mess = get_mess(message.from_user.id)
