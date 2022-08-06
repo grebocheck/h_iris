@@ -32,7 +32,10 @@ def control_user(from_user) -> None:
     if extend_user(from_user.id):
         it_user = get_user(from_user.id)
         it_user.username = from_user.username
-        it_user.name = from_user.first_name + " " + from_user.last_name
+        if from_user.last_name is not None:
+            it_user.name = from_user.first_name + " " + from_user.last_name
+        else:
+            it_user.name = from_user.first_name
         it_user.update()
     else:
         it_user = User(user_id=from_user.id,
