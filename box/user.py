@@ -2,7 +2,8 @@ from sqlalchemy import create_engine, MetaData, update, delete
 from sqlalchemy.sql import select
 from datetime import datetime
 
-from box.db import user, engine, meta
+from box.db import user, engine
+from box.mess import Mess
 
 
 # імпорт користувача з бази данних по user_id
@@ -38,8 +39,13 @@ def control_user(from_user) -> None:
             it_user.name = from_user.first_name
         it_user.update()
     else:
+        if from_user.last_name is not None:
+            name = from_user.first_name + " " + from_user.last_name
+        else:
+            name = from_user.first_name
+        Mess(user_id=from_user.id).insert()
         it_user = User(user_id=from_user.id,
-                       name=from_user.first_name + " " + from_user.last_name,
+                       name=name,
                        username=from_user.username)
         it_user.insert()
 

@@ -20,6 +20,8 @@ mess = Table(
     Column('audio', Integer),
     Column('image', Integer),
     Column('video', Integer),
+    Column('stick', Integer),
+    Column('gifes', Integer),
 )
 
 ban = Table(
