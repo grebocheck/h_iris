@@ -1,7 +1,7 @@
 import os
 from aiogram.utils.executor import start_webhook
 
-from bot.bot import *
+from bot.bote import *
 
 HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 

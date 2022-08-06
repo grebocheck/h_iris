@@ -1,7 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher, types
 
-import bot_texts
+from bot import bot_texts
 import settings
 from box.user import User, control_user, get_user
 

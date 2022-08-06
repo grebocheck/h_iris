@@ -1,5 +1,5 @@
 from aiogram import executor
-from bot.bot import *
+from bot.bote import *
 
 
 if __name__ == '__main__':
