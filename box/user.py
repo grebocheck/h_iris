@@ -8,7 +8,6 @@ from loge import log
 
 # імпорт користувача з бази данних по user_id
 def get_user(user_id) -> user:
-    log(f"викликано get_user {user_id}")
     s = select([user]).where(user.c.user_id == user_id)
     conn = engine.connect()
     result = conn.execute(s)
@@ -19,7 +18,6 @@ def get_user(user_id) -> user:
 
 # перевірка чи є користувач в базі данних
 def extend_user(user_id) -> bool:
-    log(f"викликано extend_user {user_id}")
     s = select([user]).where(user.c.user_id == user_id)
     conn = engine.connect()
     result = conn.execute(s)
@@ -65,14 +63,11 @@ class User:
         conn = engine.connect()
         result = conn.execute(ins)
         print(result)
-        log(f"Записано User {[self.user_id]}")
 
     # оновлення даних для бази данних
     def update(self) -> None:
         upd = update(user).where(user.c.user_id == self.user_id).values(name=self.name,
-                                                                        username=self.username,)
+                                                                        username=self.username, )
         conn = engine.connect()
         result = conn.execute(upd)
         print(result)
-        log(f"Оновлено User {[self.user_id]}")
-
