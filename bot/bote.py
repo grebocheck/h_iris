@@ -33,7 +33,7 @@ async def echo(message):
     mess = get_mess(message.from_user.id)
     if message.content_type == ContentType.PHOTO:
         mess.add_image()
-    elif message.content_type == ContentType.AUDIO:
+    elif message.content_type == ContentType.VOICE:
         mess.add_audio()
     elif message.content_type == ContentType.VIDEO:
         mess.add_video()

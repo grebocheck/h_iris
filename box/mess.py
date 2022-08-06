@@ -10,7 +10,13 @@ def get_mess(user_id) -> mess:
     conn = engine.connect()
     result = conn.execute(s)
     row = result.fetchone()
-    l_mess = Mess(user_id=row[0], texts=row[1], audio=row[2], image=row[3], video=row[4])
+    l_mess = Mess(user_id=row[0],
+                  texts=row[1],
+                  audio=row[2],
+                  image=row[3],
+                  video=row[4],
+                  stick=row[5],
+                  gifes=row[6])
     return l_mess
 
 
@@ -18,7 +24,7 @@ def get_stat(user_id) -> str:
     it_mess = get_mess(user_id)
     text = f"""Statistic
 texts: {it_mess.texts}
-audio: {it_mess.audio}
+voice: {it_mess.audio}
 image: {it_mess.image}
 video: {it_mess.video}
 stick: {it_mess.stick}
