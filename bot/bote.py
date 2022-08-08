@@ -5,7 +5,6 @@ from aiogram.types import ContentType
 from bot import bot_texts
 import settings
 from box.user import control_user, get_user
-from box.mess import get_stat, get_mess
 
 # Configure logging
 
@@ -23,7 +22,7 @@ async def process_help_command(message: types.Message):
 
 @dp.message_handler(commands=['stat'])
 async def process_help_command(message: types.Message):
-    text = get_stat(message.from_user.id)
+    text = bot_texts.get_stat(get_user(message.from_user.id))
     await message.reply(text)
 
 
@@ -35,18 +34,18 @@ async def process_help_command(message: types.Message):
                                    ContentType.TEXT])
 async def echo(message):
     control_user(message.from_user)
-    mess = get_mess(message.from_user.id)
+    it_user = get_user(message.from_user.id)
     if message.content_type == ContentType.PHOTO:
-        mess.add_image()
+        it_user.add_image()
     elif message.content_type == ContentType.VOICE:
-        mess.add_audio()
+        it_user.add_audio()
     elif message.content_type == ContentType.VIDEO:
-        mess.add_video()
+        it_user.add_video()
     elif message.content_type == ContentType.STICKER:
-        mess.add_stick()
+        it_user.add_stick()
     elif message.content_type == ContentType.ANIMATION:
-        mess.add_gifes()
+        it_user.add_gifes()
     else:
-        mess.add_texts()
+        it_user.add_texts()
     # it_user = get_user(message.from_user.id)
     # await message.answer(it_user.born.strftime("%m/%d/%Y, %H:%M:%S"))
