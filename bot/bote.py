@@ -17,13 +17,13 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    await message.reply(bot_texts.help)
+    await message.reply(bot_texts.help, parse_mode="Markdown")
 
 
 @dp.message_handler(commands=['stat'])
 async def process_help_command(message: types.Message):
     text = bot_texts.get_stat(get_user(message.from_user.id))
-    await message.reply(text)
+    await message.reply(text, parse_mode="Markdown")
 
 
 @dp.message_handler(content_types=[ContentType.PHOTO,
