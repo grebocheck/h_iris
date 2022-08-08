@@ -7,7 +7,7 @@ help = """Привет я помогу тебе розобраться с *бо�
 
 def get_stat(it_user) -> str:
     if it_user.username is not None:
-        name = "@"+it_user.username
+        name = "@" + it_user.username
     else:
         name = it_user.name
     text = f"""Статистика {name}
