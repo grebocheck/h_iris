@@ -11,10 +11,10 @@ def get_stat(it_user) -> str:
     else:
         name = it_user.name
     text = f"""Статистика {name}
-`Текстов:     {it_user.texts}
-Голосовых:   {it_user.audio}
-Изображений: {it_user.image}
-Видео:       {it_user.video}
-Стикеров:    {it_user.stick}
-Гифок:       {it_user.gifes}`"""
+`Текстов:      {it_user.texts}
+Голосовых:    {it_user.audio}
+Изображений:  {it_user.image}
+Видео:        {it_user.video}
+Стикеров:     {it_user.stick}
+Гифок:        {it_user.gifes}`"""
     return text
