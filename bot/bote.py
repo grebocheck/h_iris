@@ -17,11 +17,13 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
+    control_user(message.from_user)
     await message.reply(bot_texts.help, parse_mode="Markdown")
 
 
 @dp.message_handler(commands=['stat'])
 async def process_help_command(message: types.Message):
+    control_user(message.from_user)
     text = bot_texts.get_stat(get_user(message.from_user.id))
     await message.reply(text, parse_mode="Markdown")
 
