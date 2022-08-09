@@ -4,11 +4,21 @@ help = """Привет я помогу тебе розобраться с *бо�
 /mute @username 3 Hour - Замутить на 3 часа (Day, Minute), для модератора не более 2 дней
 /stat - Статистика сообщений"""
 
+bad_phrases = ['пидарас', "сука", "fack"]  # временный тестовый список
 
-bad_phrases = ['pay-me', "рішення прийнято"]  # временный тестовый список
+
+def bader(mess_text) -> bool:
+    m_text = mess_text.split(" ")
+    for a in m_text:
+        if a in bad_phrases:
+            return True
+    return False
 
 
-def get_username(it_user):
+bad_word = "Такое говорить нельзя!"
+
+
+def get_username(it_user) -> str:
     if it_user.username is not None:
         name = "@" + it_user.username
     else:
@@ -18,8 +28,12 @@ def get_username(it_user):
 
 def get_stat(it_user) -> str:
     name = get_username(it_user)
-    text = f"""Статистика {name}
-`Текстов:      {it_user.texts}
+    text = f"""Профиль {name}
+*Репутация*: {it_user.reput}
+*В групе с*: {it_user.born.strftime("%m/%d/%Y, %H:%M:%S")}
+Отправленые сообщения:
+`Всего         {it_user.messages}
+Текстов:      {it_user.texts}
 Голосовых:    {it_user.audio}
 Изображений:  {it_user.image}
 Видео:        {it_user.video}
@@ -28,9 +42,10 @@ def get_stat(it_user) -> str:
     return text
 
 
-def show_rating(it_user, incr_decr) -> str:
+def change_rep(it_user, change: bool) -> str:
     name = get_username(it_user)
-    text = f"""Рейтинг користувача {name} було {incr_decr} на 1
-Тепер він дорівнює {it_user.reput}"""  # вот тут хз сработает ли на актуальное количество репы, или надо
-    # ещё переменную передать
+    if change:
+        text = f"{name}, ваша репутация увеличина на 1"
+    else:
+        text = f"{name}, ваша репутация уменьшена на 1"
     return text

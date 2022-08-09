@@ -6,7 +6,7 @@ from box.db import user, engine
 
 
 # імпорт користувача з бази данних по user_id
-def get_user(user_id) -> user:
+def get_user(user_id: int) -> user:
     s = select([user]).where(user.c.user_id == user_id)
     conn = engine.connect()
     result = conn.execute(s)
@@ -21,12 +21,13 @@ def get_user(user_id) -> user:
                   video=row[7],
                   stick=row[8],
                   gifes=row[9],
-                  reput=row[10])
+                  reput=row[10],
+                  messages=row[11])
     return l_user
 
 
 # перевірка чи є користувач в базі данних
-def extend_user(user_id) -> bool:
+def extend_user(user_id: int) -> bool:
     s = select([user]).where(user.c.user_id == user_id)
     conn = engine.connect()
     result = conn.execute(s)
@@ -63,7 +64,7 @@ class User:
 
     def __init__(self, user_id, name, username,
                  texts=0, audio=0, image=0, video=0, stick=0, gifes=0,
-                 born=None, reput=0):
+                 born=None, reput=0, messages=0):
 
         self.user_id = user_id
         self.name = name
@@ -79,6 +80,7 @@ class User:
         self.stick = stick
         self.gifes = gifes
         self.reput = reput
+        self.messages = messages
 
     # Запис в бд
     def insert(self) -> None:
@@ -92,7 +94,8 @@ class User:
                                    video=self.video,
                                    stick=self.stick,
                                    gifes=self.gifes,
-                                   reput=self.reput)
+                                   reput=self.reput,
+                                   messages=self.messages)
         conn = engine.connect()
         result = conn.execute(ins)
         print(result)
@@ -104,6 +107,13 @@ class User:
         conn = engine.connect()
         result = conn.execute(upd)
         print(result)
+
+    # збільшити texts
+    def add_message(self) -> None:
+        self.messages += 1
+        upd = update(user).where(user.c.user_id == self.user_id).values(messages=self.messages)
+        conn = engine.connect()
+        conn.execute(upd)
 
     # збільшити texts
     def add_texts(self) -> None:
@@ -148,8 +158,12 @@ class User:
         conn.execute(upd)
 
     # збільшити репутацію
-    def add_reput(self) -> int:
-        self.reput += 1
+    def change_reput(self, add_dec: bool) -> int:
+        if add_dec:
+            self.reput += 1
+        else:
+            if self.reput > 0:
+                self.reput -= 1
         upd = update(user).where(user.c.user_id == self.user_id).values(gifes=self.reput)
         conn = engine.connect()
         conn.execute(upd)
