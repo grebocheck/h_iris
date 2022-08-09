@@ -20,18 +20,13 @@ user = Table(
     Column('reput', Integer),                       # 10
 )
 
-ban = Table(
+ham = Table(
     'ban', meta,
     Column('user_id', Integer, primary_key=True),
+    Column('admin_user_id', Integer),
     Column('start', String),
-    Column('end', String),
-)
-
-mute = Table(
-    'mute', meta,
-    Column('user_id', Integer, primary_key=True),
-    Column('start', String),
-    Column('end', String),
+    Column('ham_type', String),
+    Column('ham_time', String),
 )
 
 admin = Table(
