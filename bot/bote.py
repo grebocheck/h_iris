@@ -1,7 +1,10 @@
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ContentType
-from aiogram.dispatcher import filters
+import asyncio
+from contextlib import suppress
+from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited, MessageCantBeDeleted,
+                                      MessageToDeleteNotFound)
 
 from bot import bot_texts
 import settings
@@ -16,17 +19,29 @@ bot = Bot(token=settings.TOKEN)
 dp = Dispatcher(bot)
 
 
+async def delete_message(message: types.Message, sleep_time: int = 0):
+    await asyncio.sleep(sleep_time)
+    with suppress(MessageCantBeDeleted, MessageToDeleteNotFound):
+        await message.delete()
+
+
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
-    await message.reply(bot_texts.help, parse_mode="Markdown")
+    it_mess = await message.reply(bot_texts.help, parse_mode="Markdown")
+
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mess, 20))
 
 
 @dp.message_handler(commands=['profile'])
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
     text = bot_texts.get_stat(get_user(message.from_user.id))
-    await message.reply(text, parse_mode="Markdown")
+    it_mess = await message.reply(text, parse_mode="Markdown")
+
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mess, 20))
 
 
 @dp.message_handler(lambda message: bot_texts.get_chan(message.text) and message.reply_to_message)
@@ -36,10 +51,14 @@ async def carma(message: types.Message):
         it_user = get_user(message.reply_to_message.from_user.id)
         if bot_texts.get_chan_in(message.text, '+') and message.reply_to_message.from_user.id != message.from_user.id:
             it_user.change_reput(True)
-            await message.reply(text=bot_texts.change_rep(it_user, True))
+            it_mess = await message.reply(text=bot_texts.change_rep(it_user, True))
+            if settings.AUTO_DELETE:
+                asyncio.create_task(delete_message(it_mess, 20))
         elif bot_texts.get_chan_in(message.text, '-') and message.reply_to_message.from_user.id != message.from_user.id:
             it_user.change_reput(False)
-            await message.reply(text=bot_texts.change_rep(it_user, False))
+            it_mess = await message.reply(text=bot_texts.change_rep(it_user, False))
+            if settings.AUTO_DELETE:
+                asyncio.create_task(delete_message(it_mess, 20))
         else:
             pass
     await echo(message)
@@ -48,7 +67,9 @@ async def carma(message: types.Message):
 @dp.message_handler(lambda message: bot_texts.bader(message.text))
 async def bad(message: types.Message):
     await message.delete()
-    await message.answer(bot_texts.bad_word)
+    it_mess = await message.answer(bot_texts.bad_word)
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mess, 20))
 
 
 @dp.message_handler(content_types=[ContentType.PHOTO,
