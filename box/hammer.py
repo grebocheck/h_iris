@@ -8,6 +8,21 @@ BAN_TYPE = "BAN"
 MUTE_TYPE = "MUTE"
 
 
+# Отримати всі активні покарання
+def get_all_ham():
+    mass = []
+    get = ham.select()
+    conn = engine.connect()
+    result = conn.execute(get)
+    for row in result:
+        mass.append(Hammer(user_id=row[0],
+                           admin_user_id=row[1],
+                           start=row[2].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                           ham_type=row[3],
+                           ham_time=row[4].strptime(row[3], "%m/%d/%Y, %H:%M:%S")))
+    return mass
+
+
 # імпорт покараного з бази даних
 def get_ham(user_id: int):
     s = select([ham]).where(ham.c.user_id == user_id)
@@ -40,6 +55,46 @@ def db_mute(user_id: int, admin_user_id: int, delta_time: timedelta) -> None:
                     ham_type=MUTE_TYPE,
                     ham_time=delta_time)
     it_ham.insert()
+
+
+# Перевірка на бан
+def extend_ban(user_id):
+    s = select([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == BAN_TYPE)
+    conn = engine.connect()
+    result = conn.execute(s)
+    row = result.fetchone()
+    if row is None:
+        return False
+    else:
+        return True
+
+
+# Перевірка на мут
+def extend_mute(user_id):
+    s = select([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == MUTE_TYPE)
+    conn = engine.connect()
+    result = conn.execute(s)
+    row = result.fetchone()
+    if row is None:
+        return False
+    else:
+        return True
+
+
+# Розбан
+def db_unban(user_id):
+    if extend_mute(user_id):
+        s = delete([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == BAN_TYPE)
+        conn = engine.connect()
+        conn.execute(s)
+
+
+# Розмут
+def db_unmute(user_id):
+    if extend_mute(user_id):
+        s = delete([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == MUTE_TYPE)
+        conn = engine.connect()
+        conn.execute(s)
 
 
 class Hammer:
