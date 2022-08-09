@@ -164,7 +164,7 @@ class User:
         else:
             if self.reput > 0:
                 self.reput -= 1
-        upd = update(user).where(user.c.user_id == self.user_id).values(gifes=self.reput)
+        upd = update(user).where(user.c.user_id == self.user_id).values(reput=self.reput)
         conn = engine.connect()
         conn.execute(upd)
         return self.reput
