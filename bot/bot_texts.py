@@ -18,6 +18,22 @@ def bader(mess_text) -> bool:
 bad_word = "Такое говорить нельзя!"
 
 
+def get_chan(mess_text) -> bool:
+    m_text = mess_text.split(" ")
+    for a in m_text:
+        if a in ['+', '-']:
+            return True
+    return False
+
+
+def get_chan_in(mess_text, res) -> bool:
+    m_text = mess_text.split(" ")
+    for a in m_text:
+        if a == res:
+            return True
+    return False
+
+
 def get_username(it_user) -> str:
     if it_user.username is not None:
         name = "@" + it_user.username
