@@ -28,7 +28,12 @@ async def process_help_command(message: types.Message):
     await message.reply(text, parse_mode="Markdown")
 
 
-@dp.message_handler(content_types=ContentType.all())
+@dp.message_handler(content_types=[ContentType.PHOTO,
+                                   ContentType.VOICE,
+                                   ContentType.VIDEO,
+                                   ContentType.STICKER,
+                                   ContentType.ANIMATION,
+                                   ContentType.TEXT])
 async def echo(message):
     control_user(message.from_user)
     it_user = get_user(message.from_user.id)

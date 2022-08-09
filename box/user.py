@@ -6,7 +6,7 @@ from box.db import user, engine
 
 
 # імпорт користувача з бази данних по user_id
-def get_user(user_id: int):
+def get_user(user_id) -> user:
     s = select([user]).where(user.c.user_id == user_id)
     conn = engine.connect()
     result = conn.execute(s)
@@ -26,7 +26,7 @@ def get_user(user_id: int):
 
 
 # перевірка чи є користувач в базі данних
-def extend_user(user_id: int) -> bool:
+def extend_user(user_id) -> bool:
     s = select([user]).where(user.c.user_id == user_id)
     conn = engine.connect()
     result = conn.execute(s)
@@ -148,11 +148,8 @@ class User:
         conn.execute(upd)
 
     # збільшити репутацію
-    def add_reput(self, add_min: bool) -> int:
-        if add_min:
-            self.reput += 1
-        else:
-            self.reput -= 1
+    def add_reput(self) -> int:
+        self.reput += 1
         upd = update(user).where(user.c.user_id == self.user_id).values(gifes=self.reput)
         conn = engine.connect()
         conn.execute(upd)
