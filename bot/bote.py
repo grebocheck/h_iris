@@ -29,17 +29,15 @@ async def process_help_command(message: types.Message):
     await message.reply(text, parse_mode="Markdown")
 
 
-@dp.message_handler(filters.Text(contains=['+'], ignore_case=True),
-                    filters.Text(contains=['-'], ignore_case=True),
-                    lambda message: message.reply_to_message)
+@dp.message_handler(lambda message: bot_texts.get_chan(message.text) and message.reply_to_message)
 async def carma(message: types.Message):
     control_user(message.from_user)
     if extend_user(message.reply_to_message.from_user.id):
         it_user = get_user(message.reply_to_message.from_user.id)
-        if message.text in ["+"] and message.reply_to_message.from_user.id != message.from_user.id:
+        if bot_texts.get_chan_in(message.text, '+') and message.reply_to_message.from_user.id != message.from_user.id:
             it_user.change_reput(True)
             await message.reply(text=bot_texts.change_rep(it_user, True))
-        elif message.text in ["-"] and message.reply_to_message.from_user.id != message.from_user.id:
+        elif bot_texts.get_chan_in(message.text, '-') and message.reply_to_message.from_user.id != message.from_user.id:
             it_user.change_reput(False)
             await message.reply(text=bot_texts.change_rep(it_user, False))
         else:
