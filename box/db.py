@@ -18,6 +18,7 @@ user = Table(
     Column('stick', Integer),                       # 8
     Column('gifes', Integer),                       # 9
     Column('reput', Integer),                       # 10
+    Column('messages', String),                     # 11
 )
 
 ham = Table(
