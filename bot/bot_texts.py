@@ -20,17 +20,15 @@ bad_word = "Такое говорить нельзя!"
 
 def get_chan(mess_text) -> bool:
     m_text = mess_text.split(" ")
-    for a in m_text:
-        if a in ['+', '-']:
-            return True
+    if m_text[0] in ['+', '-']:
+        return True
     return False
 
 
 def get_chan_in(mess_text, res) -> bool:
     m_text = mess_text.split(" ")
-    for a in m_text:
-        if a == res:
-            return True
+    if m_text[0] == res:
+        return True
     return False
 
 
