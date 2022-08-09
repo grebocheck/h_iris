@@ -39,6 +39,7 @@ def extend_user(user_id) -> bool:
 
 # функція контролю користувача
 def control_user(from_user) -> None:
+    print("checking user")
     if extend_user(from_user.id):
         it_user = get_user(from_user.id)
         it_user.username = from_user.username
@@ -56,6 +57,16 @@ def control_user(from_user) -> None:
                        name=name,
                        username=from_user.username)
         it_user.insert()
+
+
+def message_check(mes: str, bad_phr: list) -> bool:
+    if not bad_phr:
+        return False
+    if bad_phr[0] in mes:
+        return True
+    else:
+        bad_phr.pop(0)
+        return message_check(mes, bad_phr)
 
 
 # Клас описуючий короткі відомості про користувача
@@ -148,9 +159,21 @@ class User:
         conn.execute(upd)
 
     # збільшити репутацію
-    def add_reput(self) -> int:
+    def add_reput(self):
         self.reput += 1
-        upd = update(user).where(user.c.user_id == self.user_id).values(gifes=self.reput)
+        upd = update(user).where(user.c.user_id == self.user_id).values(reput=self.reput)
         conn = engine.connect()
         conn.execute(upd)
-        return self.reput
+        # временно закоменчу ретерн, если понадобится верну
+        # return self.reput
+
+    def decr_reput(self) -> bool:
+        if self.reput > 0:
+            self.reput -= 1
+            upd = update(user).where(user.c.user_id == self.user_id).values(reput=self.reput)
+            conn = engine.connect()
+            conn.execute(upd)
+            return True
+        else:
+            return False
+
