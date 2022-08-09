@@ -1,6 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ContentType
+from aiogram.dispatcher import filters
 
 from bot import bot_texts
 import settings
@@ -28,7 +29,8 @@ async def process_help_command(message: types.Message):
     await message.reply(text, parse_mode="Markdown")
 
 
-@dp.message_handler(lambda message: message.text in ["+", "-"] and message.reply_to_message)
+@dp.message_handler(filters.Text(contains=['+', '-'], ignore_case=True),
+                    lambda message: message.reply_to_message)
 async def carma(message: types.Message):
     control_user(message.from_user)
     if extend_user(message.reply_to_message.from_user.id):
