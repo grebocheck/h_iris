@@ -29,7 +29,8 @@ async def process_help_command(message: types.Message):
     await message.reply(text, parse_mode="Markdown")
 
 
-@dp.message_handler(filters.Text(contains=['+', '-'], ignore_case=True),
+@dp.message_handler(filters.Text(contains=['+'], ignore_case=True),
+                    filters.Text(contains=['-'], ignore_case=True),
                     lambda message: message.reply_to_message)
 async def carma(message: types.Message):
     control_user(message.from_user)
@@ -43,6 +44,7 @@ async def carma(message: types.Message):
             await message.reply(text=bot_texts.change_rep(it_user, False))
         else:
             pass
+    await echo(message)
 
 
 @dp.message_handler(lambda message: bot_texts.bader(message.text))
