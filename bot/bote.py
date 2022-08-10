@@ -102,7 +102,7 @@ async def unban_command(message: types.Message):
         user_to_unban_pre = get_user_by_name(name)
         if user_to_unban_pre[0]:
             user_to_unban = user_to_unban_pre[1]
-            await bot.unban_chat_member(message.chat.id, user_to_unban)
+            await bot.unban_chat_member(message.chat.id, user_to_unban.user_id)
             db_unban(user_to_unban)
             it_mes = await message.answer(bot_texts.unbaned(user_to_unban))
         else:
