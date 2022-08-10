@@ -17,9 +17,9 @@ def get_all_ham():
     for row in result:
         mass.append(Hammer(user_id=row[0],
                            admin_user_id=row[1],
-                           start=row[2].strptime("%m/%d/%Y, %H:%M:%S"),
+                           start=datetime.strptime(row[2], "%m/%d/%Y, %H:%M:%S"),
                            ham_type=row[3],
-                           ham_time=row[4].strptime("%m/%d/%Y, %H:%M:%S"),
+                           ham_time=datetime.strptime(row[4], "%m/%d/%Y, %H:%M:%S"),
                            comment=row[5]))
     return mass
 
@@ -32,9 +32,9 @@ def get_ham(user_id: int):
     row = result.fetchone()
     l_ham = Hammer(user_id=row[0],
                    admin_user_id=row[1],
-                   start=row[2].strptime("%m/%d/%Y, %H:%M:%S"),
+                   start=datetime.strptime(row[2], "%m/%d/%Y, %H:%M:%S"),
                    ham_type=row[3],
-                   ham_time=row[4].strptime("%m/%d/%Y, %H:%M:%S"),
+                   ham_time=datetime.strptime(row[4], "%m/%d/%Y, %H:%M:%S"),
                    comment=row[5])
     return l_ham
 
@@ -56,7 +56,7 @@ def db_mute(user_id: int, admin_user_id: int, delta_time: timedelta, comment: st
                     admin_user_id=admin_user_id,
                     start=datetime.now(),
                     ham_type=MUTE_TYPE,
-                    ham_time=datetime.now()+delta_time,
+                    ham_time=datetime.now() + delta_time,
                     comment=comment)
     it_ham.insert()
 
