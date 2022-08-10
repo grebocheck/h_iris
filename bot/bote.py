@@ -32,7 +32,7 @@ async def delete_message(message: types.Message, sleep_time: int = settings.DEL_
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
-    it_mess = await message.reply(bot_texts.help, parse_mode="Markdown")
+    it_mess = await message.answer(bot_texts.help, parse_mode="Markdown")
 
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
@@ -45,7 +45,7 @@ async def process_help_command(message: types.Message):
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
     text = bot_texts.get_stat(get_user(message.from_user.id))
-    it_mess = await message.reply(text, parse_mode="Markdown")
+    it_mess = await message.answer(text, parse_mode="Markdown")
 
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
