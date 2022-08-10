@@ -88,17 +88,17 @@ def extend_mute(user_id):
 # Розбан
 def db_unban(user_id):
     if extend_ban(user_id):
-        s = delete([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == BAN_TYPE)
+        dele = delete(ham).where(ham.c.user_id == user_id).where(ham.c.ham_type == BAN_TYPE)
         conn = engine.connect()
-        conn.execute(s)
+        conn.execute(dele)
 
 
 # Розмут
 def db_unmute(user_id):
     if extend_mute(user_id):
-        s = delete([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == MUTE_TYPE)
+        dele = delete(ham).where(ham.c.user_id == user_id).where(ham.c.ham_type == MUTE_TYPE)
         conn = engine.connect()
-        conn.execute(s)
+        conn.execute(dele)
 
 
 def calculate_punish_time(td: timedelta):
