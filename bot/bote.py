@@ -149,7 +149,9 @@ async def carma(message: types.Message):
 
 
 # ANOTHER
-@dp.message_handler(content_types=ContentType.all())
+@dp.message_handler(content_types=[ContentType.TEXT, ContentType.VIDEO, ContentType.VOICE,
+                                   ContentType.AUDIO,ContentType.PHOTO, ContentType.ANIMATION,
+                                   ContentType.STICKER, ContentType.VIDEO_NOTE])
 async def echo(message: types.Message):
     control_user(message.from_user)
     it_user = get_user(message.from_user.id)
