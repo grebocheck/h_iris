@@ -17,9 +17,9 @@ def get_all_ham():
     for row in result:
         mass.append(Hammer(user_id=row[0],
                            admin_user_id=row[1],
-                           start=row[2].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                           start=row[2].strptime("%m/%d/%Y, %H:%M:%S"),
                            ham_type=row[3],
-                           ham_time=row[4].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                           ham_time=row[4].strptime("%m/%d/%Y, %H:%M:%S"),
                            comment=row[5]))
     return mass
 
@@ -32,9 +32,9 @@ def get_ham(user_id: int):
     row = result.fetchone()
     l_ham = Hammer(user_id=row[0],
                    admin_user_id=row[1],
-                   start=row[2].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                   start=row[2].strptime("%m/%d/%Y, %H:%M:%S"),
                    ham_type=row[3],
-                   ham_time=row[4].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                   ham_time=row[4].strptime("%m/%d/%Y, %H:%M:%S"),
                    comment=row[5])
     return l_ham
 
