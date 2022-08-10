@@ -83,7 +83,7 @@ def extend_mute(user_id):
 
 # Розбан
 def db_unban(user_id):
-    if extend_mute(user_id):
+    if extend_ban(user_id):
         s = delete([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == BAN_TYPE)
         conn = engine.connect()
         conn.execute(s)
@@ -95,6 +95,52 @@ def db_unmute(user_id):
         s = delete([ham]).where(ham.c.user_id == user_id).where(ham.c.ham_type == MUTE_TYPE)
         conn = engine.connect()
         conn.execute(s)
+
+
+def calculate_punish_time(td: timedelta):
+    return datetime.now() + td  # формирует само время мута
+
+
+def punish_time_patterns(m_time: int, measure: str):
+    # функция для подсчета времени мута
+    if measure == 'хв' or measure == 'хвилин':
+        return calculate_punish_time(timedelta(minutes=m_time)).timestamp()
+
+    elif measure == 'г' or measure == 'год' or measure == 'годин':
+        return calculate_punish_time(timedelta(hours=m_time)).timestamp()
+
+    elif measure == 'д' or measure == 'днів':
+        return calculate_punish_time(timedelta(days=m_time)).timestamp()
+
+    else:
+        raise TypeError
+
+
+def form_context(punish_info: list, username: str):
+    # формирует фактически инфу про бан или мут из сообщения пользователя
+    mes_len = len(punish_info)
+    context = dict()
+    if mes_len > 3:
+        # это по длине мута
+        context.update({'punish_type': punish_info[0][1:],
+                        'username': username})
+        if context.get('punish_type') == 'mute':
+            try:
+                m_time = int(punish_info[1])
+                m_measure = punish_info[2]
+                context.update({'punish_time': punish_time_patterns(m_time, m_measure)})
+            except:
+                return context.clear()
+            context.update({'comment': " ".join(punish_info[3:])})
+            print(context)
+    elif mes_len > 2:
+        # это бана
+        context.update({'username': username,
+                        'punish_type': punish_info[0][1:],
+                        'punish_time': 'на веки вечные',
+                        'comment': " ".join(punish_info[1:])})
+        print(context)
+    return context  # если не подошло ничего вернется пустая инфа
 
 
 class Hammer:

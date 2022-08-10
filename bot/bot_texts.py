@@ -18,6 +18,9 @@ def bader(mess_text) -> bool:
 bad_word = "Такое говорить нельзя!"
 
 
+not_replied = "Это не ответ на сообщение"
+
+
 def get_chan(mess_text) -> bool:
     m_text = mess_text.split(" ")
     if m_text[0] in ['+', '-']:
@@ -63,3 +66,14 @@ def change_rep(it_user, change: bool) -> str:
     else:
         text = f"{name}, ваша репутация уменьшена на 1"
     return text
+
+
+def show_admin_comment(context):
+    # это функция для вывода наказания юзера
+    text = f"""Наказанный пользователь: {context.get('username')}
+Админ: {context.get('admin_username')}
+Тип наказания: {context.get('punish_type')}
+Время наказания: {context.get('punish_time')}
+Коммент от админа: {context.get('comment')}"""
+    return text
+

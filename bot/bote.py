@@ -1,7 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ContentType
-import asyncio
+
 from contextlib import suppress
 from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited, MessageCantBeDeleted,
                                       MessageToDeleteNotFound)
@@ -9,6 +9,8 @@ from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited
 from bot import bot_texts
 import settings
 from box.user import control_user, get_user, extend_user
+from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, form_context
+import asyncio
 
 # Configure logging
 
@@ -39,7 +41,6 @@ async def process_help_command(message: types.Message):
     control_user(message.from_user)
     text = bot_texts.get_stat(get_user(message.from_user.id))
     it_mess = await message.reply(text, parse_mode="Markdown")
-
     if settings.AUTO_DELETE:
         asyncio.create_task(delete_message(it_mess, 20))
 
@@ -70,6 +71,64 @@ async def bad(message: types.Message):
     it_mess = await message.answer(bot_texts.bad_word)
     if settings.AUTO_DELETE:
         asyncio.create_task(delete_message(it_mess, 20))
+
+
+@dp.message_handler(lambda message: message.reply_to_message, commands='report')
+async def report_command(message: types.Message):
+    control_user(message.from_user)
+    admins = []  # тут будет список админов из бд
+    for admin in admins:
+        await bot.send_message(admin.user_id, f"")  # тут будет прямая ссылка на сообщение
+    await message.delete()
+    it_mes = await message.answer("Reported")
+
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes, 20))
+
+
+@dp.message_handler(lambda message: message.reply_to_message, commands='ban')
+async def ban_command(message: types.Message):
+    control_user(message.from_user)
+    admin = {'rank': 2}  # тут будет получение админа и его ранга из бд, пока так
+    if not admin:  # если админа не найдет то сразу выкинет
+        it_mes = await message.answer('Нет прав')
+        if settings.AUTO_DELETE:
+            asyncio.create_task(delete_message(it_mes, 20))
+        return
+    user_to_ban = message.reply_to_message.from_user.id
+    ban_mes = message.text.split()
+    print(ban_mes)
+    context = form_context(ban_mes, bot_texts.get_username(get_user(user_to_ban)))
+    if context and admin["rank"] == 2:  # бан на втором ранге
+        await bot.ban_chat_member(message.chat.id, user_to_ban)
+        db_ban(user_to_ban, message.from_user.id)
+        await message.delete()
+        it_mes = await message.answer(bot_texts.show_admin_comment(context))
+    else:
+        it_mes = await message.answer('Что-то пошло не по плану\nВид бан сообщения: /ban мой коммент...')
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes, 20))
+
+
+@dp.message_handler(lambda message: message.reply_to_message, commands='unban')
+async def unban_command(message: types.Message):
+    control_user(message.from_user)
+    user_to_unban = message.reply_to_message.from_user.id
+    admin = {'rank': 2}
+    # тут в принцыпе всё то же самое ток с разбаном
+    if not admin:
+        it_mes = await message.answer('Нет прав')
+        if settings.AUTO_DELETE:
+            asyncio.create_task(delete_message(it_mes, 20))
+        return
+    if admin["rank"] == 2:
+        await bot.unban_chat_member(message.chat.id, user_to_unban)
+        db_unban(user_to_unban)
+        it_mes = await message.answer("Пользователь разбанен")
+    else:
+        it_mes = await message.answer("Недостаточно прав")
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes, 20))
 
 
 @dp.message_handler(content_types=[ContentType.PHOTO,
