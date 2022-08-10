@@ -45,12 +45,12 @@ def ham_text(HAMMER) -> str:
         time_end = HAMMER.ham_time.strftime("%m/%d/%Y, %H:%M:%S")
 
     text = f"""Наказан пользователь {get_username(get_user(HAMMER.user_id))}
-ID: {HAMMER.user_id}
+ID: `{HAMMER.user_id}`
 Наказание: *{it_type}*
 Наказал: {get_username(get_user(HAMMER.admin_user_id))}
 Был заблокирован: _{HAMMER.start.strftime("%m/%d/%Y, %H:%M:%S")}_
 Закончиться: _{time_end}_
-Причина: {HAMMER.comment}
+Причина: *{HAMMER.comment}*
 """
     return text
 
