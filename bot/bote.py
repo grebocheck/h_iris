@@ -83,7 +83,7 @@ async def ban_command(message: types.Message):
         db_ban(user_id=user_to_ban,
                admin_user_id=message.from_user.id,
                comment=comment)
-        it_mes = await message.answer(bot_texts.ham_text(get_ham(message.from_user.id)))
+        it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_ban)))
     else:
         it_mes = await message.answer(bot_texts.none_rights)
 
