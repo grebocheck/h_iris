@@ -78,6 +78,7 @@ async def ban_command(message: types.Message):
         user_to_ban = message.reply_to_message.from_user.id
         comment = message.text[5:]
         print("pre:" + comment)
+        print(comment == "")
         if comment == '':
             comment = "None"
         print("pos:" + comment)
