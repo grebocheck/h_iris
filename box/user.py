@@ -28,7 +28,7 @@ def get_user(user_id: int) -> user:
 
 # Получить юзера по юзернейм имени
 def get_user_by_name(namer: str) -> user:
-    s = select([user]).where(user.c.username == namer)
+    s = select([user]).where(user.c.username == namer[1:])
     conn = engine.connect()
     result = conn.execute(s)
     row = result.fetchone()
