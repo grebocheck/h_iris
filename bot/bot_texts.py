@@ -50,6 +50,7 @@ ID: {HAMMER.user_id}
 Наказал: {get_username(get_user(HAMMER.admin_user_id))}
 Был заблокирован: _{HAMMER.start.strftime("%m/%d/%Y, %H:%M:%S")}_
 Закончиться: _{time_end}_
+Причина: {HAMMER.comment}
 """
     return text
 
