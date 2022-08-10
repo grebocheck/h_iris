@@ -24,17 +24,13 @@ async def on_shutdown(dispatcher):
 
 
 if __name__ == '__main__':
-    while True:
-        try:
-            logging.basicConfig(level=logging.INFO)
-            start_webhook(
-                dispatcher=dp,
-                webhook_path=WEBHOOK_PATH,
-                skip_updates=True,
-                on_startup=on_startup,
-                on_shutdown=on_shutdown,
-                host=WEBAPP_HOST,
-                port=WEBAPP_PORT,
-            )
-        except Exception as ex:
-            print(ex)
+    logging.basicConfig(level=logging.INFO)
+    start_webhook(
+        dispatcher=dp,
+        webhook_path=WEBHOOK_PATH,
+        skip_updates=True,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
+    )
