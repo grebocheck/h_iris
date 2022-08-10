@@ -48,7 +48,7 @@ def ham_text(HAMMER) -> str:
 ID: {HAMMER.user_id}
 Наказание: *{it_type}*
 Наказал: {get_username(get_user(HAMMER.admin_user_id))}
-Был заблокирован: _{HAMMER.ham_end.strftime("%m/%d/%Y, %H:%M:%S")}_
+Был заблокирован: _{HAMMER.start.strftime("%m/%d/%Y, %H:%M:%S")}_
 Закончиться: _{time_end}_
 """
     return text
