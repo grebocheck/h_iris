@@ -14,7 +14,7 @@ bad_phrases = ['пидарас', "сука", "fack"]  # временный те�
 def bader(mess_text) -> bool:
     m_text = mess_text.split(" ")
     for a in m_text:
-        if a in bad_phrases:
+        if a.lower() in bad_phrases:
             return True
     return False
 
