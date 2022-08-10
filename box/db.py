@@ -23,7 +23,7 @@ user = Table(
 
 ham = Table(
     'ban', meta,
-    Column('user_id', Integer, primary_key=True),
+    Column('user_id', Integer),
     Column('admin_user_id', Integer),
     Column('start', String),
     Column('ham_type', String),

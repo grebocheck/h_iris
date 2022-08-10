@@ -77,12 +77,8 @@ async def ban_command(message: types.Message):
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
         user_to_ban = message.reply_to_message.from_user.id
         comment = message.text[5:]
-        print("mes:"+message.text)
-        print("pre:" + comment)
-        print(comment == "")
         if comment == '':
-            comment = "None"
-        print("pos:" + comment)
+            comment = "Нету"
         await bot.ban_chat_member(message.chat.id, user_to_ban)
         db_ban(user_id=user_to_ban,
                admin_user_id=message.from_user.id,
