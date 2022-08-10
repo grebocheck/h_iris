@@ -26,6 +26,34 @@ def get_user(user_id: int) -> user:
     return l_user
 
 
+# Получить юзера по юзернейм имени
+def get_user_by_name(namer: str) -> user:
+    s = select([user]).where(user.c.username == namer)
+    conn = engine.connect()
+    result = conn.execute(s)
+    row = result.fetchone()
+    if row is None:
+        s = select([user]).where(user.c.name == namer)
+        conn = engine.connect()
+        result = conn.execute(s)
+        row = result.fetchone()
+        if row is None:
+            return [False]
+    l_user = User(user_id=row[0],
+                  name=row[1],
+                  username=row[2],
+                  born=datetime.strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                  texts=row[4],
+                  audio=row[5],
+                  image=row[6],
+                  video=row[7],
+                  stick=row[8],
+                  gifes=row[9],
+                  reput=row[10],
+                  messages=row[11])
+    return [True, l_user]
+
+
 # перевірка чи є користувач в базі данних
 def extend_user(user_id: int) -> bool:
     s = select([user]).where(user.c.user_id == user_id)

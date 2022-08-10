@@ -28,6 +28,7 @@ ham = Table(
     Column('start', String),
     Column('ham_type', String),
     Column('ham_time', String),
+    Column('comment', String),
 )
 
 admin = Table(

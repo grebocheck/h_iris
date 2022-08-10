@@ -19,7 +19,8 @@ def get_all_ham():
                            admin_user_id=row[1],
                            start=row[2].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
                            ham_type=row[3],
-                           ham_time=row[4].strptime(row[3], "%m/%d/%Y, %H:%M:%S")))
+                           ham_time=row[4].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                           comment=row[5]))
     return mass
 
 
@@ -33,27 +34,30 @@ def get_ham(user_id: int):
                    admin_user_id=row[1],
                    start=row[2].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
                    ham_type=row[3],
-                   ham_time=row[4].strptime(row[3], "%m/%d/%Y, %H:%M:%S"))
+                   ham_time=row[4].strptime(row[3], "%m/%d/%Y, %H:%M:%S"),
+                   comment=row[5])
     return l_ham
 
 
 # Бан юзера в базі даних
-def db_ban(user_id: int, admin_user_id: int) -> None:
+def db_ban(user_id: int, admin_user_id: int, comment: str) -> None:
     it_ham = Hammer(user_id=user_id,
                     admin_user_id=admin_user_id,
                     start=datetime.now(),
                     ham_type=BAN_TYPE,
-                    ham_time=datetime.now())
+                    ham_time=datetime.now(),
+                    comment=comment)
     it_ham.insert()
 
 
 # Мут юзера в базі даних
-def db_mute(user_id: int, admin_user_id: int, delta_time: timedelta) -> None:
+def db_mute(user_id: int, admin_user_id: int, delta_time: timedelta, comment: str) -> None:
     it_ham = Hammer(user_id=user_id,
                     admin_user_id=admin_user_id,
                     start=datetime.now(),
                     ham_type=MUTE_TYPE,
-                    ham_time=delta_time)
+                    ham_time=datetime.now()+delta_time,
+                    comment=comment)
     it_ham.insert()
 
 
@@ -116,35 +120,8 @@ def punish_time_patterns(m_time: int, measure: str):
         raise TypeError
 
 
-def form_context(punish_info: list, username: str):
-    # формирует фактически инфу про бан или мут из сообщения пользователя
-    mes_len = len(punish_info)
-    context = dict()
-    if mes_len > 3:
-        # это по длине мута
-        context.update({'punish_type': punish_info[0][1:],
-                        'username': username})
-        if context.get('punish_type') == 'mute':
-            try:
-                m_time = int(punish_info[1])
-                m_measure = punish_info[2]
-                context.update({'punish_time': punish_time_patterns(m_time, m_measure)})
-            except:
-                return context.clear()
-            context.update({'comment': " ".join(punish_info[3:])})
-            print(context)
-    elif mes_len > 2:
-        # это бана
-        context.update({'username': username,
-                        'punish_type': punish_info[0][1:],
-                        'punish_time': 'на веки вечные',
-                        'comment': " ".join(punish_info[1:])})
-        print(context)
-    return context  # если не подошло ничего вернется пустая инфа
-
-
 class Hammer:
-    def __init__(self, user_id, admin_user_id, start, ham_type, ham_time):
+    def __init__(self, user_id, admin_user_id, start, ham_type, ham_time, comment):
         self.user_id = user_id
         self.admin_user_id = admin_user_id
         if start is not None:
@@ -153,6 +130,7 @@ class Hammer:
             self.start = datetime.now()
         self.ham_type = ham_type
         self.ham_time = ham_time
+        self.comment = comment
 
     # Запис в бд
     def insert(self) -> None:
@@ -160,7 +138,8 @@ class Hammer:
                                   admin_user_id=self.admin_user_id,
                                   start=self.start.strftime("%m/%d/%Y, %H:%M:%S"),
                                   ham_type=self.ham_type,
-                                  ham_time=self.ham_time.strftime("%m/%d/%Y, %H:%M:%S"))
+                                  ham_time=self.ham_time.strftime("%m/%d/%Y, %H:%M:%S"),
+                                  comment=self.comment)
         conn = engine.connect()
         result = conn.execute(ins)
         print(result)
