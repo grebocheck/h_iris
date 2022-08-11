@@ -9,7 +9,7 @@ from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited
 from bot import bot_texts
 import settings
 from box.user import control_user, get_user, extend_user, get_user_by_name
-from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, get_ham
+from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, get_ham, get_punish_time
 import asyncio
 
 # Configure logging
@@ -117,6 +117,66 @@ async def unban_command(message: types.Message):
         asyncio.create_task(delete_message(it_mes))
 
 
+# MUTE
+@dp.message_handler(lambda message: message.reply_to_message, commands='mute')
+async def mute_command(message: types.Message):
+    control_user(message.from_user)
+    if message.from_user.id in settings.SUPER_ADMINS:
+        user_to_mute = message.reply_to_message.from_user.id
+        info = message.text.split()
+        try:
+            # ['/mute', '5', 'min', 'comment', 'comment']
+            mute_dur = info[1:3]
+            comment = ' '.join(info[3:]) if len(info) > 3 else 'Нету'
+            # возвращает объект тайм-дельта
+            delta_time = get_punish_time(mute_dur)
+            await bot.restrict_chat_member(message.chat.id, user_to_mute, until_date=delta_time)
+            db_mute(user_to_mute, message.from_user.id, delta_time, comment)
+            it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_mute)))
+        except IndexError:
+            # сработает если команда введена неправильно
+            it_mes = await message.answer(bot_texts.incor_command_form)
+        except TypeError:
+            # должно схватить ошибку в формировании времени
+            it_mes = await message.answer(bot_texts.incor_time_mute)
+    else:
+        it_mes = await message.answer(bot_texts.none_rights)
+    if settings.AUTO_DELETE_COMMAND:
+        await message.delete()
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes))
+
+
+# UNMUTE
+@dp.message_handler(commands='unmute')
+async def unmute_command(message: types.Message):
+    control_user(message.from_user)
+    if message.from_user.id in settings.SUPER_ADMINS:
+        try:
+            name = message.text.split()[1]
+            user_to_unmute_pre = get_user_by_name(name)
+            if user_to_unmute_pre[0]:
+                user_to_unmute = user_to_unmute_pre[1]
+                # даёт разрешения пользователю, похоже размут делается так(надеюсь)
+                await bot.restrict_chat_member(message.chat.id, user_to_unmute.user_id,
+                                               can_send_messages=True,
+                                               can_send_media_messages=True,
+                                               can_send_other_messages=True)
+                db_unmute(user_to_unmute.user_id)
+                it_mes = await message.answer(bot_texts.unmuted(user_to_unmute))
+            else:
+                it_mes = await message.answer(bot_texts.user_no)
+        except IndexError:
+            # сработает если команда введена неправильно
+            it_mes = await message.answer(bot_texts.incor_command_form)
+    else:
+        it_mes = await message.answer(bot_texts.none_rights)
+    if settings.AUTO_DELETE_COMMAND:
+        await message.delete()
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes))
+
+
 # BAD PHRASE FILTER
 @dp.message_handler(lambda message: bot_texts.bader(message.text))
 async def bad(message: types.Message):
@@ -150,7 +210,7 @@ async def carma(message: types.Message):
 
 # ANOTHER
 @dp.message_handler(content_types=[ContentType.TEXT, ContentType.VIDEO, ContentType.VOICE,
-                                   ContentType.AUDIO,ContentType.PHOTO, ContentType.ANIMATION,
+                                   ContentType.AUDIO, ContentType.PHOTO, ContentType.ANIMATION,
                                    ContentType.STICKER, ContentType.VIDEO_NOTE])
 async def echo(message: types.Message):
     control_user(message.from_user)

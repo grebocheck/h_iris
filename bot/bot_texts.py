@@ -1,5 +1,6 @@
 from box.user import get_user
 from box.hammer import BAN_TYPE
+from settings import APP_LANGUAGE
 from datetime import datetime, timedelta
 
 help = """Привет я помогу тебе розобраться с *ботом*
@@ -29,10 +30,32 @@ none_rights = "Недостаточно прав"
 
 user_no = "Этого пользователя не найдено"
 
+incor_command_form = "Неправильный формат команды"
+
+incor_time_mute = "Возможно, неправильно введено время мута"
+
+time_patterns = {
+    'en': {
+            'm': ['m', 'min', 'minute', 'minutes'],
+            'h': ['h', 'hour', 'hours'],
+            'd': ['d', 'day', 'days'],
+           }
+}
+
+
+def get_time_pattern(key, users_meas):
+    return users_meas in time_patterns[APP_LANGUAGE][key]
+
 
 def unbaned(it_user) -> str:
     name = get_username(it_user)
     text = f"{name} розбанен"
+    return text
+
+
+def unmuted(it_user) -> str:
+    name = get_username(it_user)
+    text = f"{name} размучен"
     return text
 
 
