@@ -100,7 +100,7 @@ async def unwarn_command(message: types.Message):
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
         it_user = get_user(message.reply_to_message.from_user.id)
         it_user.change_warns(False)
-        it_mes = await message.answer(bot_texts.had_warns(it_user))
+        it_mes = await message.answer(bot_texts.not_warns(it_user))
 
         if settings.AUTO_DELETE_COMMAND:
             await message.delete()
