@@ -51,6 +51,13 @@ def db_ban(user_id: int, admin_user_id: int, comment: str) -> None:
     it_ham.insert()
 
 
+# Очистка бази данних від відстрочений мутів
+def clear_mutes() -> None:
+    dele = delete(ham).where(ham.c.ham_type == MUTE_TYPE).where(datetime.strptime(ham.c.ham_time, "%m/%d/%Y, %H:%M:%S") < datetime.now())
+    conn = engine.connect()
+    conn.execute(dele)
+
+
 # Мут юзера в базі даних
 def db_mute(user_id: int, admin_user_id: int, delta_time: timedelta, comment: str) -> None:
     it_ham = Hammer(user_id=user_id,
