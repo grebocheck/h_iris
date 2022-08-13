@@ -57,7 +57,7 @@ def clear_mutes() -> None:
     conn = engine.connect()
     result = conn.execute(s)
     for row in result:
-        ham_time=datetime.strptime(row[4], "%m/%d/%Y, %H:%M:%S")
+        ham_time = datetime.strptime(row[4], "%m/%d/%Y, %H:%M:%S")
         if ham_time < datetime.now():
             dele = delete(ham).where(ham.c.ham_time == row[4])
             conn = engine.connect()
