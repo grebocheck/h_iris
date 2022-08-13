@@ -57,7 +57,7 @@ async def process_help_command(message: types.Message):
 @dp.message_handler(lambda message: message.reply_to_message, commands='report')
 async def report_command(message: types.Message):
     control_user(message.from_user)
-    chat_url = message.chat.get_url()
+    chat_url = settings.GROUP_URL
     await bot.send_message(settings.ADMIN_GROUP, bot_texts.reporter(m_id=message.reply_to_message.message_id,
                                                                     chat_url=chat_url,
                                                                     name=bot_texts.get_username(
