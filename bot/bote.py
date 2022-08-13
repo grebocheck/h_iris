@@ -9,7 +9,7 @@ from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited
 from bot import bot_texts
 import settings
 from box.user import control_user, get_user, extend_user, get_user_by_name
-from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, get_ham, get_punish_time
+from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, get_ham, get_punish_time, get_all_ham
 import asyncio
 
 # Configure logging
@@ -229,6 +229,18 @@ async def unmute_command(message: types.Message):
         await message.delete()
     if settings.AUTO_DELETE:
         asyncio.create_task(delete_message(it_mes))
+
+
+# HAMMER, List all ban/mute
+@dp.message_handler(commands='hammer')
+async def bad(message: types.Message):
+    ham_list = get_all_ham()
+    it_mes = await message.answer(bot_texts.all_hams(ham_list))
+
+    if settings.AUTO_DELETE_COMMAND:
+        await message.delete()
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes, 60))
 
 
 # BAD PHRASE FILTER

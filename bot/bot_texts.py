@@ -59,6 +59,18 @@ def get_time_pattern(key, users_meas):
     return users_meas in time_patterns[APP_LANGUAGE][key]
 
 
+def all_hams(ham_list):
+    text = ""
+    if ham_list == []:
+        text += "Активних покарань немає"
+    else:
+        text += "ID".ljust(10) + "|" + "Имя".ljust(15) + "|" + "Админ".ljust(15) + "|" + "Тип".ljust(5)
+        for a in ham_list:
+            text += str(a.user_id).ljust(10) + "|" + get_username(get_user(a.user_id)).ljust(15) + "|" \
+                    + get_username(get_user(a.admin_user_id)).ljust(15) + "|" + a.ham_type.ljust(5)
+    return text
+
+
 def unbaned(it_user) -> str:
     name = get_username(it_user)
     text = f"{name} розбанен"
