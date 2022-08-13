@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, MetaData, update, delete
 from sqlalchemy.sql import select
 from datetime import datetime
 
+import settings
 from box.db import user, engine
 
 
@@ -53,7 +54,8 @@ def get_user_by_name(namer: str) -> user:
                   stick=row[8],
                   gifes=row[9],
                   reput=row[10],
-                  messages=row[11])
+                  messages=row[11],
+                  warns=row[12])
     return [True, l_user]
 
 
@@ -95,7 +97,7 @@ class User:
 
     def __init__(self, user_id, name, username,
                  texts=0, audio=0, image=0, video=0, stick=0, gifes=0,
-                 born=None, reput=0, messages=0):
+                 born=None, reput=0, messages=0, warns=0):
 
         self.user_id = user_id
         self.name = name
@@ -112,6 +114,7 @@ class User:
         self.gifes = gifes
         self.reput = reput
         self.messages = messages
+        self.warns = warns
 
     # Запис в бд
     def insert(self) -> None:
@@ -199,3 +202,11 @@ class User:
         conn = engine.connect()
         conn.execute(upd)
         return self.reput
+
+    # збільшити warns, якщо кількість варнів більша/рівна налаштуванню то дає бан
+    def add_warns(self) -> int:
+        self.warns += 1
+        upd = update(user).where(user.c.user_id == self.user_id).values(warns=self.warns)
+        conn = engine.connect()
+        conn.execute(upd)
+        return self.warns
