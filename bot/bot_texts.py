@@ -48,7 +48,11 @@ time_patterns = {
 
 
 def had_warns(it_user):
-    return f"{get_username(it_user)} получил варн {it_user.warns}/{settings.MAX_WARNS}"
+    return f"{get_username(it_user)} получил варн *{it_user.warns}/{settings.MAX_WARNS}*"
+
+
+def not_warns(it_user):
+    return f"{get_username(it_user)} потерял варн и теперь имеет *{it_user.warns}/{settings.MAX_WARNS}*"
 
 
 def get_time_pattern(key, users_meas):

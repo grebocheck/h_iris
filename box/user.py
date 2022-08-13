@@ -205,9 +205,21 @@ class User:
         conn.execute(upd)
         return self.reput
 
-    # збільшити warns, якщо кількість варнів більша/рівна налаштуванню то дає бан
-    def add_warns(self) -> int:
-        self.warns += 1
+    # змінити warns
+    def change_warns(self, add_dec: bool) -> int:
+        if add_dec:
+            self.warns += 1
+        else:
+            if self.warns > 0:
+                self.warns -= 1
+        upd = update(user).where(user.c.user_id == self.user_id).values(warns=self.warns)
+        conn = engine.connect()
+        conn.execute(upd)
+        return self.warns
+
+    # зняти всі варни
+    def reset_warns(self) -> int:
+        self.warns = 0
         upd = update(user).where(user.c.user_id == self.user_id).values(warns=self.warns)
         conn = engine.connect()
         conn.execute(upd)
