@@ -1,7 +1,7 @@
 import os
 
-TOKEN = ('')  # telegram bot api TOKEN @BotFather
-# DATABASE = "postgresql" + os.getenv('DATABASE_URL')[8:]  # sqlite:///bot.db
+TOKEN = os.getenv("TOKEN")  # telegram bot api TOKEN @BotFather
+DATABASE = "postgresql" + os.getenv('DATABASE_URL')[8:]  # sqlite:///bot.db
 ADMIN_GROUP = -1001673592113  # ID ADMIN GROUP
 
 AUTO_DELETE = True  # Auto delete bot messages

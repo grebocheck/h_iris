@@ -3,7 +3,7 @@ from sqlalchemy.sql import select
 from datetime import datetime, timedelta
 
 from box.db import ham, engine
-from bot.bot_texts import get_time_pattern
+from bot import bot_texts
 
 BAN_TYPE = "BAN"
 MUTE_TYPE = "MUTE"
@@ -102,33 +102,14 @@ def db_unmute(user_id):
         conn.execute(dele)
 
 
-"""Если будет нужно возвращать именно ДО какого времени а не дельту"""
-# def calculate_punish_time(td: timedelta):
-#     return datetime.now() + td  # формирует само время мута
-
-
-# def get_punish_time(mute_dur: list):
-#     # функция для подсчета времени мута
-#     m_time, measure = mute_dur[0], mute_dur[1]
-#     if get_time_pattern('m', measure):
-#         return calculate_punish_time(timedelta(minutes=m_time)).timestamp()
-#     elif get_time_pattern('h', measure):
-#         return calculate_punish_time(timedelta(hours=m_time)).timestamp()
-#     elif get_time_pattern('d', measure):
-#         return calculate_punish_time(timedelta(hours=m_time)).timestamp()
-#     else:
-#         raise TypeError
-""""""
-
-
 def get_punish_time(mute_dur: list) -> timedelta:
     # функция для подсчета времени мута
-    m_time, measure = mute_dur[0], mute_dur[1]
-    if get_time_pattern('m', measure):
+    m_time, measure = int(mute_dur[0]), mute_dur[1]
+    if bot_texts.get_time_pattern('m', measure):
         return timedelta(minutes=m_time)
-    elif get_time_pattern('h', measure):
+    elif bot_texts.get_time_pattern('h', measure):
         return timedelta(hours=m_time)
-    elif get_time_pattern('d', measure):
+    elif bot_texts.get_time_pattern('d', measure):
         return timedelta(hours=m_time)
     else:
         raise TypeError

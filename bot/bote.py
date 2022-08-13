@@ -17,7 +17,7 @@ import asyncio
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot and dispatcher
-bot = Bot(token=settings.TOKEN)
+bot = Bot(token=settings.TOKEN, parse_mode="Markdown")
 dp = Dispatcher(bot)
 
 
@@ -32,7 +32,7 @@ async def delete_message(message: types.Message, sleep_time: int = settings.DEL_
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
-    it_mess = await message.answer(bot_texts.help, parse_mode="Markdown")
+    it_mess = await message.answer(bot_texts.help)
 
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
@@ -45,7 +45,7 @@ async def process_help_command(message: types.Message):
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
     text = bot_texts.get_stat(get_user(message.from_user.id))
-    it_mess = await message.answer(text, parse_mode="Markdown")
+    it_mess = await message.answer(text)
 
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
@@ -62,7 +62,7 @@ async def report_command(message: types.Message):
                                                                     chat_url=chat_url,
                                                                     name=bot_texts.get_username(
                                                                         get_user(message.from_user.id))))
-    it_mes = await message.answer(bot_texts.reported, parse_mode="Markdown")
+    it_mes = await message.answer(bot_texts.reported)
 
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
@@ -83,9 +83,9 @@ async def ban_command(message: types.Message):
         db_ban(user_id=user_to_ban,
                admin_user_id=message.from_user.id,
                comment=comment)
-        it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_ban)), parse_mode="Markdown")
+        it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_ban)))
     else:
-        it_mes = await message.answer(bot_texts.none_rights, parse_mode="Markdown")
+        it_mes = await message.answer(bot_texts.none_rights)
 
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
@@ -105,11 +105,11 @@ async def unban_command(message: types.Message):
             user_to_unban = user_to_unban_pre[1]
             await bot.unban_chat_member(message.chat.id, user_to_unban.user_id)
             db_unban(user_to_unban.user_id)
-            it_mes = await message.answer(bot_texts.unbaned(user_to_unban), parse_mode="Markdown")
+            it_mes = await message.answer(bot_texts.unbaned(user_to_unban))
         else:
-            it_mes = await message.answer(bot_texts.user_no, parse_mode="Markdown")
+            it_mes = await message.answer(bot_texts.user_no)
     else:
-        it_mes = await message.answer(bot_texts.none_rights, parse_mode="Markdown")
+        it_mes = await message.answer(bot_texts.none_rights)
 
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
@@ -153,7 +153,7 @@ async def unmute_command(message: types.Message):
     control_user(message.from_user)
     if message.from_user.id in settings.SUPER_ADMINS:
         try:
-            name = message.text.split()[1]
+            name = message.text[8:]
             user_to_unmute_pre = get_user_by_name(name)
             if user_to_unmute_pre[0]:
                 user_to_unmute = user_to_unmute_pre[1]
@@ -181,7 +181,7 @@ async def unmute_command(message: types.Message):
 @dp.message_handler(lambda message: bot_texts.bader(message.text))
 async def bad(message: types.Message):
     await message.delete()
-    it_mess = await message.answer(bot_texts.bad_word, parse_mode="Markdown")
+    it_mess = await message.answer(bot_texts.bad_word)
 
     if settings.AUTO_DELETE:
         asyncio.create_task(delete_message(it_mess, 20))
@@ -195,12 +195,12 @@ async def carma(message: types.Message):
         it_user = get_user(message.reply_to_message.from_user.id)
         if bot_texts.get_chan_in(message.text, '+') and message.reply_to_message.from_user.id != message.from_user.id:
             it_user.change_reput(True)
-            it_mess = await message.reply(text=bot_texts.change_rep(it_user, True), parse_mode="Markdown")
+            it_mess = await message.reply(text=bot_texts.change_rep(it_user, True))
             if settings.AUTO_DELETE:
                 asyncio.create_task(delete_message(it_mess, 20))
         elif bot_texts.get_chan_in(message.text, '-') and message.reply_to_message.from_user.id != message.from_user.id:
             it_user.change_reput(False)
-            it_mess = await message.reply(text=bot_texts.change_rep(it_user, False), parse_mode="Markdown")
+            it_mess = await message.reply(text=bot_texts.change_rep(it_user, False))
             if settings.AUTO_DELETE:
                 asyncio.create_task(delete_message(it_mess))
         else:

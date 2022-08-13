@@ -28,17 +28,20 @@ def get_user(user_id: int) -> user:
 
 # Получить юзера по юзернейм имени
 def get_user_by_name(namer: str) -> user:
-    s = select([user]).where(user.c.username == namer[1:])
+    print(1)
+    s = select([user]).where(user.c.username == namer.replace('@', ''))
     conn = engine.connect()
     result = conn.execute(s)
     row = result.fetchone()
     if row is None:
+        print(2)
         s = select([user]).where(user.c.name == namer)
         conn = engine.connect()
         result = conn.execute(s)
         row = result.fetchone()
         if row is None:
             return [False]
+    print(3)
     l_user = User(user_id=row[0],
                   name=row[1],
                   username=row[2],
