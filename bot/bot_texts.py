@@ -64,9 +64,9 @@ def all_hams(ham_list):
     if ham_list == []:
         text += "Активних покарань немає`"
     else:
-        text += "ID".ljust(10) + "|" + "Имя".ljust(15) + "|" + "Админ".ljust(15) + "|" + "Тип".ljust(5) + "\n"
+        text += "ID".ljust(10) + "|" + "Имя".ljust(20) + "|" + "Админ".ljust(15) + "|" + "Тип".ljust(5) + "\n"
         for a in ham_list:
-            text += str(a.user_id).ljust(10) + "|" + get_username(get_user(a.user_id)).ljust(15) + "|" \
+            text += str(a.user_id).ljust(10) + "|" + get_username(get_user(a.user_id)).ljust(20) + "|" \
                     + get_username(get_user(a.admin_user_id)).ljust(15) + "|" + a.ham_type.ljust(5) + "\n"
         text += "`"
     return text
