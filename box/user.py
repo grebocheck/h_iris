@@ -23,7 +23,8 @@ def get_user(user_id: int) -> user:
                   stick=row[8],
                   gifes=row[9],
                   reput=row[10],
-                  messages=row[11])
+                  messages=row[11],
+                  warns=row[12])
     return l_user
 
 
@@ -129,7 +130,8 @@ class User:
                                    stick=self.stick,
                                    gifes=self.gifes,
                                    reput=self.reput,
-                                   messages=self.messages)
+                                   messages=self.messages,
+                                   warns=self.warns)
         conn = engine.connect()
         result = conn.execute(ins)
         print(result)

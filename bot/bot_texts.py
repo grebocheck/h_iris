@@ -1,3 +1,4 @@
+import settings
 from box.user import get_user
 from box.hammer import BAN_TYPE
 from settings import APP_LANGUAGE
@@ -35,13 +36,19 @@ incor_command_form = "Неправильный формат команды"
 
 incor_time_mute = "Возможно, неправильно введено время мута"
 
+comment_max_warn = "Пользователь получил максимум варнов"
+
 time_patterns = {
     'en': {
-            'm': ['m', 'min', 'minute', 'minutes'],
-            'h': ['h', 'hour', 'hours'],
-            'd': ['d', 'day', 'days'],
-           }
+        'm': ['m', 'min', 'minute', 'minutes'],
+        'h': ['h', 'hour', 'hours'],
+        'd': ['d', 'day', 'days'],
+    }
 }
+
+
+def had_warns(it_user):
+    return f"{get_username(it_user)} получил варн {it_user.warns}/{settings.MAX_WARNS}"
 
 
 def get_time_pattern(key, users_meas):
@@ -109,6 +116,7 @@ def get_stat(it_user) -> str:
     name = get_username(it_user)
     text = f"""Профиль {name}
 *Репутация*: {it_user.reput}
+*Варны*: {it_user.warns}
 *В групе с*: {it_user.born.strftime("%m/%d/%Y, %H:%M:%S")}
 Отправленые сообщения:
 `Всего         {it_user.messages}

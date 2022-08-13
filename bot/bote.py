@@ -70,6 +70,28 @@ async def report_command(message: types.Message):
         asyncio.create_task(delete_message(it_mes))
 
 
+# WARN
+@dp.message_handler(lambda message: message.reply_to_message, commands='warn')
+async def warn_command(message: types.Message):
+    control_user(message.from_user)
+    if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
+        it_user = get_user(message.reply_to_message.from_user.id)
+        warns = it_user.add_warns()
+        if warns >= settings.MAX_WARNS:
+            await bot.ban_chat_member(message.chat.id, it_user.user_id)
+            db_ban(user_id=it_user.user_id,
+                   admin_user_id=message.from_user.id,
+                   comment=bot_texts.comment_max_warn)
+            it_mes = await message.answer(bot_texts.ham_text(get_ham(it_user.user_id)))
+        else:
+            it_mes = await message.answer(bot_texts.had_warns(it_user))
+
+        if settings.AUTO_DELETE_COMMAND:
+            await message.delete()
+        if settings.AUTO_DELETE:
+            asyncio.create_task(delete_message(it_mes))
+
+
 # BAN
 @dp.message_handler(lambda message: message.reply_to_message, commands='ban')
 async def ban_command(message: types.Message):
