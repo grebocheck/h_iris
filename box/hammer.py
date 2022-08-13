@@ -53,9 +53,15 @@ def db_ban(user_id: int, admin_user_id: int, comment: str) -> None:
 
 # Очистка бази данних від відстрочений мутів
 def clear_mutes() -> None:
-    dele = delete(ham).where(ham.c.ham_type == MUTE_TYPE).where(datetime.strptime(ham.c.ham_time, "%m/%d/%Y, %H:%M:%S") < datetime.now())
+    s = select([ham]).where(ham.c.ham_type == MUTE_TYPE)
     conn = engine.connect()
-    conn.execute(dele)
+    result = conn.execute(s)
+    for row in result:
+        ham_time=datetime.strptime(row[4], "%m/%d/%Y, %H:%M:%S")
+        if ham_time < datetime.now():
+            dele = delete(ham).where(ham.c.ham_time == row[4])
+            conn = engine.connect()
+            conn.execute(dele)
 
 
 # Мут юзера в базі даних
