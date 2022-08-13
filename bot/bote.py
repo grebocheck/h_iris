@@ -9,7 +9,8 @@ from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited
 from bot import bot_texts
 import settings
 from box.user import control_user, get_user, extend_user, get_user_by_name
-from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, get_ham, get_punish_time, get_all_ham, clear_mutes
+from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, get_ham, get_punish_time, \
+    get_all_ham, clear_mutes
 import asyncio
 
 # Configure logging
@@ -57,10 +58,11 @@ async def process_help_command(message: types.Message):
 @dp.message_handler(lambda message: message.reply_to_message, commands='report')
 async def report_command(message: types.Message):
     control_user(message.from_user)
-    chat_url = settings.GROUP_URL
-    await bot.send_message(settings.ADMIN_GROUP, bot_texts.reporter(m_id=message.reply_to_message.message_id,
-                                                                    chat_url=chat_url,
-                                                                    name=bot_texts.get_username(get_user(message.from_user.id))))
+    chat_url = message.url
+    await bot.send_message(settings.ADMIN_GROUP,
+                           bot_texts.reporter(m_url=message.reply_to_message.url,
+                                              it_user=get_user(message.from_user.id)),
+                           parse_mode="HTML")
     it_mes = await message.answer(bot_texts.reported)
 
     if settings.AUTO_DELETE_COMMAND:
