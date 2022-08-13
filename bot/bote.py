@@ -58,7 +58,7 @@ async def process_help_command(message: types.Message):
 async def report_command(message: types.Message):
     control_user(message.from_user)
     chat_url = message.chat.get_url()
-    await bot.send_message(settings.ADMIN_GROUP, bot_texts.reported(m_id=message.reply_to_message.message_id,
+    await bot.send_message(settings.ADMIN_GROUP, bot_texts.reporter(m_id=message.reply_to_message.message_id,
                                                                     chat_url=chat_url,
                                                                     name=bot_texts.get_username(
                                                                         get_user(message.from_user.id))))
@@ -75,22 +75,27 @@ async def report_command(message: types.Message):
 async def warn_command(message: types.Message):
     control_user(message.from_user)
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
-        it_user = get_user(message.reply_to_message.from_user.id)
-        warns = it_user.change_warns(True)
-        if warns >= settings.MAX_WARNS:
-            await bot.ban_chat_member(message.chat.id, it_user.user_id)
-            db_ban(user_id=it_user.user_id,
-                   admin_user_id=message.from_user.id,
-                   comment=bot_texts.comment_max_warn)
-            it_user.reset_warns()
-            it_mes = await message.answer(bot_texts.ham_text(get_ham(it_user.user_id)))
+        if extend_user(message.reply_to_message.from_user.id):
+            it_user = get_user(message.reply_to_message.from_user.id)
+            warns = it_user.change_warns(True)
+            if warns >= settings.MAX_WARNS:
+                await bot.ban_chat_member(message.chat.id, it_user.user_id)
+                db_ban(user_id=it_user.user_id,
+                       admin_user_id=message.from_user.id,
+                       comment=bot_texts.comment_max_warn)
+                it_user.reset_warns()
+                it_mes = await message.answer(bot_texts.ham_text(get_ham(it_user.user_id)))
+            else:
+                it_mes = await message.answer(bot_texts.had_warns(it_user))
         else:
-            it_mes = await message.answer(bot_texts.had_warns(it_user))
+            it_mes = await message.answer(bot_texts.user_no)
+    else:
+        it_mes = await message.answer(bot_texts.none_rights)
 
-        if settings.AUTO_DELETE_COMMAND:
-            await message.delete()
-        if settings.AUTO_DELETE:
-            asyncio.create_task(delete_message(it_mes))
+    if settings.AUTO_DELETE_COMMAND:
+        await message.delete()
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes))
 
 
 # UNWARN
@@ -98,14 +103,19 @@ async def warn_command(message: types.Message):
 async def unwarn_command(message: types.Message):
     control_user(message.from_user)
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
-        it_user = get_user(message.reply_to_message.from_user.id)
-        it_user.change_warns(False)
-        it_mes = await message.answer(bot_texts.not_warns(it_user))
+        if extend_user(message.reply_to_message.from_user.id):
+            it_user = get_user(message.reply_to_message.from_user.id)
+            it_user.change_warns(False)
+            it_mes = await message.answer(bot_texts.not_warns(it_user))
+        else:
+            it_mes = await message.answer(bot_texts.user_no)
+    else:
+        it_mes = await message.answer(bot_texts.none_rights)
 
-        if settings.AUTO_DELETE_COMMAND:
-            await message.delete()
-        if settings.AUTO_DELETE:
-            asyncio.create_task(delete_message(it_mes))
+    if settings.AUTO_DELETE_COMMAND:
+        await message.delete()
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mes))
 
 
 # BAN
@@ -113,15 +123,18 @@ async def unwarn_command(message: types.Message):
 async def ban_command(message: types.Message):
     control_user(message.from_user)
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
-        user_to_ban = message.reply_to_message.from_user.id
-        comment = message.text[5:]
-        if comment == '':
-            comment = "Нету"
-        await bot.ban_chat_member(message.chat.id, user_to_ban)
-        db_ban(user_id=user_to_ban,
-               admin_user_id=message.from_user.id,
-               comment=comment)
-        it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_ban)))
+        if extend_user(message.reply_to_message.from_user.id):
+            user_to_ban = message.reply_to_message.from_user.id
+            comment = message.text[5:]
+            if comment == '':
+                comment = "Нету"
+            await bot.ban_chat_member(message.chat.id, user_to_ban)
+            db_ban(user_id=user_to_ban,
+                   admin_user_id=message.from_user.id,
+                   comment=comment)
+            it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_ban)))
+        else:
+            it_mes = await message.answer(bot_texts.user_no)
     else:
         it_mes = await message.answer(bot_texts.none_rights)
 
@@ -160,23 +173,26 @@ async def unban_command(message: types.Message):
 async def mute_command(message: types.Message):
     control_user(message.from_user)
     if message.from_user.id in settings.SUPER_ADMINS:
-        user_to_mute = message.reply_to_message.from_user.id
-        info = message.text.split()
-        try:
-            # ['/mute', '5', 'min', 'comment', 'comment']
-            mute_dur = info[1:3]
-            comment = ' '.join(info[3:]) if len(info) > 3 else 'Нету'
-            # возвращает объект тайм-дельта
-            delta_time = get_punish_time(mute_dur)
-            await bot.restrict_chat_member(message.chat.id, user_to_mute, until_date=delta_time)
-            db_mute(user_to_mute, message.from_user.id, delta_time, comment)
-            it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_mute)))
-        except IndexError:
-            # сработает если команда введена неправильно
-            it_mes = await message.answer(bot_texts.incor_command_form)
-        except TypeError:
-            # должно схватить ошибку в формировании времени
-            it_mes = await message.answer(bot_texts.incor_time_mute)
+        if extend_user(message.reply_to_message.from_user.id):
+            user_to_mute = message.reply_to_message.from_user.id
+            info = message.text.split()
+            try:
+                # ['/mute', '5', 'min', 'comment', 'comment']
+                mute_dur = info[1:3]
+                comment = ' '.join(info[3:]) if len(info) > 3 else 'Нету'
+                # возвращает объект тайм-дельта
+                delta_time = get_punish_time(mute_dur)
+                await bot.restrict_chat_member(message.chat.id, user_to_mute, until_date=delta_time)
+                db_mute(user_to_mute, message.from_user.id, delta_time, comment)
+                it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_mute)))
+            except IndexError:
+                # сработает если команда введена неправильно
+                it_mes = await message.answer(bot_texts.incor_command_form)
+            except TypeError:
+                # должно схватить ошибку в формировании времени
+                it_mes = await message.answer(bot_texts.incor_time_mute)
+        else:
+            it_mes = await message.answer(bot_texts.user_no)
     else:
         it_mes = await message.answer(bot_texts.none_rights)
     if settings.AUTO_DELETE_COMMAND:
