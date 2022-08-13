@@ -120,7 +120,7 @@ def get_stat(it_user) -> str:
     name = get_username(it_user)
     text = f"""Профиль {name}
 *Репутация*: {it_user.reput}
-*Варны*: {it_user.warns}
+*Варны*: {it_user.warns}/{settings.MAX_WARNS}
 *В групе с*: {it_user.born.strftime("%m/%d/%Y, %H:%M:%S")}
 Отправленые сообщения:
 `Всего         {it_user.messages}
