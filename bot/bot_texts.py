@@ -104,8 +104,7 @@ ID: `{HAMMER.user_id}`
 
 
 def reporter(m_id, chat_url, name):
-    text = f"""{name} відправив репорт на
-{chat_url}/{m_id}"""
+    text = f"""{name} відправив репорт на {chat_url}/{m_id}"""
     return text
 
 

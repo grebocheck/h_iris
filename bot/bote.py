@@ -60,8 +60,7 @@ async def report_command(message: types.Message):
     chat_url = settings.GROUP_URL
     await bot.send_message(settings.ADMIN_GROUP, bot_texts.reporter(m_id=message.reply_to_message.message_id,
                                                                     chat_url=chat_url,
-                                                                    name=bot_texts.get_username(
-                                                                        get_user(message.from_user.id))))
+                                                                    name=bot_texts.get_username(get_user(message.from_user.id))))
     it_mes = await message.answer(bot_texts.reported)
 
     if settings.AUTO_DELETE_COMMAND:
