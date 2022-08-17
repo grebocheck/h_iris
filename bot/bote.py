@@ -32,7 +32,7 @@ async def delete_message(message: types.Message, sleep_time: int = settings.DEL_
 # use settings for messages
 def mess_use(message, it_mess, need_log=False):
     if settings.BOT_LOG and need_log:
-        await message.forward(settings.BOT_LOG_GROUP)
+        await message.copy_to(chat_id=settings.BOT_LOG_GROUP)
     if settings.AUTO_DELETE_COMMAND:
         await message.delete()
     if settings.AUTO_DELETE:
