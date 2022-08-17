@@ -12,6 +12,6 @@ APP_LANGUAGE = 'en'  # user's language
 MAX_WARNS = 3  # max warns, get ban user if his had max warns
 GROUP_URL = "https://t.me/shard_test"  # group url
 BOT_LOG = True  # save messages from ban/mute/warn
-BOT_LOG_GROUP = -1001673592113  # group for BOT_LOG
+BOT_LOG_GROUP = -1001795166159  # group for BOT_LOG
 WARN_LIVE = 1  # days living warn
 WARN_LIVE_ALL = False  # all warns minus if time reduce compleate
