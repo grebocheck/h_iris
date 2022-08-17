@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, MetaData, update, delete
 from sqlalchemy.sql import select
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import settings
 from box.db import user, engine
@@ -24,7 +24,8 @@ def get_user(user_id: int) -> user:
                   gifes=row[9],
                   reput=row[10],
                   messages=row[11],
-                  warns=row[12])
+                  warns=row[12],
+                  warnborn=row[13])
     return l_user
 
 
@@ -56,7 +57,8 @@ def get_user_by_name(namer: str) -> user:
                   gifes=row[9],
                   reput=row[10],
                   messages=row[11],
-                  warns=row[12])
+                  warns=row[12],
+                  warnborn=row[13])
     return [True, l_user]
 
 
@@ -98,7 +100,7 @@ class User:
 
     def __init__(self, user_id, name, username,
                  texts=0, audio=0, image=0, video=0, stick=0, gifes=0,
-                 born=None, reput=0, messages=0, warns=0):
+                 born=None, reput=0, messages=0, warns=0, warnborn=None):
 
         self.user_id = user_id
         self.name = name
@@ -116,6 +118,7 @@ class User:
         self.reput = reput
         self.messages = messages
         self.warns = warns
+        self.warnborn = warnborn
 
     # Запис в бд
     def insert(self) -> None:
@@ -131,7 +134,8 @@ class User:
                                    gifes=self.gifes,
                                    reput=self.reput,
                                    messages=self.messages,
-                                   warns=self.warns)
+                                   warns=self.warns,
+                                   warnborn=self.warnborn)
         conn = engine.connect()
         result = conn.execute(ins)
         print(result)
@@ -209,9 +213,24 @@ class User:
     def change_warns(self, add_dec: bool) -> int:
         if add_dec:
             self.warns += 1
+            self.warnborn = datetime.now()
+            upd2 = update(user).where(user.c.user_id == self.user_id).values(
+                warnborn=self.warnborn.strftime("%m/%d/%Y, %H:%M:%S"))
+            conn2 = engine.connect()
+            conn2.execute(upd2)
         else:
             if self.warns > 0:
                 self.warns -= 1
+                if self.warns == 0:
+                    self.warnborn = None
+                    upd2 = update(user).where(user.c.user_id == self.user_id).values(
+                        warnborn=self.warnborn)
+                else:
+                    self.warnborn = datetime.now()
+                    upd2 = update(user).where(user.c.user_id == self.user_id).values(
+                        warnborn=self.warnborn.strftime("%m/%d/%Y, %H:%M:%S"))
+                conn2 = engine.connect()
+                conn2.execute(upd2)
         upd = update(user).where(user.c.user_id == self.user_id).values(warns=self.warns)
         conn = engine.connect()
         conn.execute(upd)
@@ -220,7 +239,19 @@ class User:
     # зняти всі варни
     def reset_warns(self) -> int:
         self.warns = 0
-        upd = update(user).where(user.c.user_id == self.user_id).values(warns=self.warns)
+        self.warnborn = None
+        upd = update(user).where(user.c.user_id == self.user_id).values(warns=self.warns,
+                                                                        warnborn=self.warnborn)
         conn = engine.connect()
         conn.execute(upd)
         return self.warns
+
+    # функція зняття варну при умові проходження потрібного часу
+    def control_warn(self) -> None:
+        now_time = datetime.now()
+        if self.warns > 0 and self.warnborn is not None:
+            if now_time > self.warnborn + timedelta(days=settings.WARN_LIVE):
+                if settings.WARN_LIVE_ALL:
+                    self.reset_warns()
+                else:
+                    self.change_warns(False)

@@ -47,12 +47,12 @@ time_patterns = {
 }
 
 
-def had_warns(it_user):
-    return f"{get_username(it_user)} получил варн *{it_user.warns}/{settings.MAX_WARNS}*"
+def had_warns(it_user, admin):
+    return f"{get_username(it_user)} получил варн *{it_user.warns}/{settings.MAX_WARNS} от {get_username(admin)}*"
 
 
-def not_warns(it_user):
-    return f"{get_username(it_user)} потерял варн и теперь имеет *{it_user.warns}/{settings.MAX_WARNS}*"
+def not_warns(it_user, admin):
+    return f"{get_username(admin)} снял варн с {get_username(it_user)} *{it_user.warns}/{settings.MAX_WARNS}*"
 
 
 def get_time_pattern(key, users_meas):
@@ -72,15 +72,13 @@ def all_hams(ham_list):
     return text
 
 
-def unbaned(it_user) -> str:
-    name = get_username(it_user)
-    text = f"{name} розбанен"
+def unbaned(it_user, admin) -> str:
+    text = f"{get_username(admin)} розбанил {get_username(it_user)}"
     return text
 
 
-def unmuted(it_user) -> str:
-    name = get_username(it_user)
-    text = f"{name} размучен"
+def unmuted(it_user, admin) -> str:
+    text = f"{get_username(admin)} розмутил {get_username(it_user)}"
     return text
 
 

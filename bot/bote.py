@@ -29,29 +29,35 @@ async def delete_message(message: types.Message, sleep_time: int = settings.DEL_
         await message.delete()
 
 
+# use settings for messages
+def mess_use(message, it_mess, need_log=False):
+    if settings.BOT_LOG and need_log:
+        await message.forward(settings.BOT_LOG_GROUP)
+    if settings.AUTO_DELETE_COMMAND:
+        await message.delete()
+    if settings.AUTO_DELETE:
+        asyncio.create_task(delete_message(it_mess))
+
+
 # HELP
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
     it_mess = await message.answer(bot_texts.help)
 
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mess))
+    mess_use(message, it_mess)
 
 
 # PROFILE
 @dp.message_handler(commands=['profile'])
 async def process_help_command(message: types.Message):
     control_user(message.from_user)
-    text = bot_texts.get_stat(get_user(message.from_user.id))
+    it_user = get_user(message.from_user.id)
+    it_user.control_warn()
+    text = bot_texts.get_stat(it_user)
     it_mess = await message.answer(text)
 
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mess))
+    mess_use(message, it_mess)
 
 
 # REPORT
@@ -62,12 +68,9 @@ async def report_command(message: types.Message):
                            bot_texts.reporter(m_url=message.reply_to_message.url,
                                               it_user=get_user(message.from_user.id)),
                            parse_mode="HTML")
-    it_mes = await message.answer(bot_texts.reported)
+    it_mess = await message.answer(bot_texts.reported)
 
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mes))
+    mess_use(message, it_mess, need_log=True)
 
 
 # WARN
@@ -77,6 +80,8 @@ async def warn_command(message: types.Message):
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
         if extend_user(message.reply_to_message.from_user.id):
             it_user = get_user(message.reply_to_message.from_user.id)
+            it_user.control_warn()
+            admin = get_user(message.from_user.id)
             warns = it_user.change_warns(True)
             if warns >= settings.MAX_WARNS:
                 await bot.ban_chat_member(message.chat.id, it_user.user_id)
@@ -86,16 +91,16 @@ async def warn_command(message: types.Message):
                 it_user.reset_warns()
                 it_mes = await message.answer(bot_texts.ham_text(get_ham(it_user.user_id)))
             else:
-                it_mes = await message.answer(bot_texts.had_warns(it_user))
+                it_mes = await message.answer(bot_texts.had_warns(it_user, admin))
+            need_log = True
         else:
             it_mes = await message.answer(bot_texts.user_no)
+            need_log = False
     else:
         it_mes = await message.answer(bot_texts.none_rights)
+        need_log = False
 
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mes))
+    mess_use(message, it_mes, need_log=need_log)
 
 
 # UNWARN
@@ -105,17 +110,19 @@ async def unwarn_command(message: types.Message):
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
         if extend_user(message.reply_to_message.from_user.id):
             it_user = get_user(message.reply_to_message.from_user.id)
+            it_user.control_warn()
+            admin = get_user(message.from_user.id)
             it_user.change_warns(False)
-            it_mes = await message.answer(bot_texts.not_warns(it_user))
+            it_mes = await message.answer(bot_texts.not_warns(it_user, admin))
+            need_log = True
         else:
             it_mes = await message.answer(bot_texts.user_no)
+            need_log = False
     else:
         it_mes = await message.answer(bot_texts.none_rights)
+        need_log = False
 
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mes))
+    mess_use(message, it_mes, need_log=need_log)
 
 
 # BAN
@@ -133,15 +140,15 @@ async def ban_command(message: types.Message):
                    admin_user_id=message.from_user.id,
                    comment=comment)
             it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_ban)))
+            need_log = True
         else:
             it_mes = await message.answer(bot_texts.user_no)
+            need_log = False
     else:
         it_mes = await message.answer(bot_texts.none_rights)
+        need_log = False
 
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mes))
+        mess_use(message, it_mes, need_log=need_log)
 
 
 # UNBAN
@@ -150,22 +157,22 @@ async def unban_command(message: types.Message):
     control_user(message.from_user)
     if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
         name = message.text[7:]
-        print(name)
         user_to_unban_pre = get_user_by_name(name)
         if user_to_unban_pre[0]:
             user_to_unban = user_to_unban_pre[1]
+            admin = get_user(message.from_user.id)
             await bot.unban_chat_member(message.chat.id, user_to_unban.user_id)
             db_unban(user_to_unban.user_id)
-            it_mes = await message.answer(bot_texts.unbaned(user_to_unban))
+            it_mes = await message.answer(bot_texts.unbaned(user_to_unban, admin))
+            need_log = True
         else:
             it_mes = await message.answer(bot_texts.user_no)
+            need_log = False
     else:
         it_mes = await message.answer(bot_texts.none_rights)
+        need_log = False
 
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mes))
+    mess_use(message, it_mes, need_log=need_log)
 
 
 # MUTE
@@ -185,20 +192,23 @@ async def mute_command(message: types.Message):
                 await bot.restrict_chat_member(message.chat.id, user_to_mute, until_date=delta_time)
                 db_mute(user_to_mute, message.from_user.id, delta_time, comment)
                 it_mes = await message.answer(bot_texts.ham_text(get_ham(user_to_mute)))
+                need_log = True
             except IndexError:
                 # сработает если команда введена неправильно
                 it_mes = await message.answer(bot_texts.incor_command_form)
+                need_log = False
             except TypeError:
                 # должно схватить ошибку в формировании времени
                 it_mes = await message.answer(bot_texts.incor_time_mute)
+                need_log = False
         else:
             it_mes = await message.answer(bot_texts.user_no)
+            need_log = False
     else:
         it_mes = await message.answer(bot_texts.none_rights)
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mes))
+        need_log = False
+
+    mess_use(message, it_mes, need_log=need_log)
 
 
 # UNMUTE
@@ -211,24 +221,27 @@ async def unmute_command(message: types.Message):
             user_to_unmute_pre = get_user_by_name(name)
             if user_to_unmute_pre[0]:
                 user_to_unmute = user_to_unmute_pre[1]
+                admin = get_user(message.from_user.id)
                 # даёт разрешения пользователю, похоже размут делается так(надеюсь)
                 await bot.restrict_chat_member(message.chat.id, user_to_unmute.user_id,
                                                can_send_messages=True,
                                                can_send_media_messages=True,
                                                can_send_other_messages=True)
                 db_unmute(user_to_unmute.user_id)
-                it_mes = await message.answer(bot_texts.unmuted(user_to_unmute))
+                it_mes = await message.answer(bot_texts.unmuted(user_to_unmute, admin))
+                need_log = True
             else:
                 it_mes = await message.answer(bot_texts.user_no)
+                need_log = False
         except IndexError:
             # сработает если команда введена неправильно
             it_mes = await message.answer(bot_texts.incor_command_form)
+            need_log = False
     else:
         it_mes = await message.answer(bot_texts.none_rights)
-    if settings.AUTO_DELETE_COMMAND:
-        await message.delete()
-    if settings.AUTO_DELETE:
-        asyncio.create_task(delete_message(it_mes))
+        need_log = False
+
+    mess_use(message, it_mes, need_log=need_log)
 
 
 # HAMMER, List all active ban/mute

@@ -20,6 +20,7 @@ user = Table(
     Column('reput', Integer),                       # 10
     Column('messages', Integer),                    # 11
     Column('warns', Integer),                       # 12
+    Column('warnborn', String),                     # 13
 )
 
 ham = Table(
