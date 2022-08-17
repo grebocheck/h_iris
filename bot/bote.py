@@ -30,7 +30,7 @@ async def delete_message(message: types.Message, sleep_time: int = settings.DEL_
 
 
 # use settings for messages
-def mess_use(message, it_mess, need_log=False):
+async def mess_use(message, it_mess, need_log=False):
     if settings.BOT_LOG and need_log:
         await message.copy_to(chat_id=settings.BOT_LOG_GROUP)
     if settings.AUTO_DELETE_COMMAND:
@@ -45,7 +45,7 @@ async def process_help_command(message: types.Message):
     control_user(message.from_user)
     it_mess = await message.answer(bot_texts.help)
 
-    mess_use(message, it_mess)
+    await mess_use(message, it_mess)
 
 
 # PROFILE
@@ -57,7 +57,7 @@ async def process_help_command(message: types.Message):
     text = bot_texts.get_stat(it_user)
     it_mess = await message.answer(text)
 
-    mess_use(message, it_mess)
+    await mess_use(message, it_mess)
 
 
 # REPORT
@@ -70,7 +70,7 @@ async def report_command(message: types.Message):
                            parse_mode="HTML")
     it_mess = await message.answer(bot_texts.reported)
 
-    mess_use(message, it_mess, need_log=True)
+    await mess_use(message, it_mess, need_log=True)
 
 
 # WARN
@@ -100,7 +100,7 @@ async def warn_command(message: types.Message):
         it_mes = await message.answer(bot_texts.none_rights)
         need_log = False
 
-    mess_use(message, it_mes, need_log=need_log)
+    await mess_use(message, it_mes, need_log=need_log)
 
 
 # UNWARN
@@ -122,7 +122,7 @@ async def unwarn_command(message: types.Message):
         it_mes = await message.answer(bot_texts.none_rights)
         need_log = False
 
-    mess_use(message, it_mes, need_log=need_log)
+    await mess_use(message, it_mes, need_log=need_log)
 
 
 # BAN
@@ -148,7 +148,7 @@ async def ban_command(message: types.Message):
         it_mes = await message.answer(bot_texts.none_rights)
         need_log = False
 
-        mess_use(message, it_mes, need_log=need_log)
+    await mess_use(message, it_mes, need_log=need_log)
 
 
 # UNBAN
@@ -172,7 +172,7 @@ async def unban_command(message: types.Message):
         it_mes = await message.answer(bot_texts.none_rights)
         need_log = False
 
-    mess_use(message, it_mes, need_log=need_log)
+    await mess_use(message, it_mes, need_log=need_log)
 
 
 # MUTE
@@ -208,7 +208,7 @@ async def mute_command(message: types.Message):
         it_mes = await message.answer(bot_texts.none_rights)
         need_log = False
 
-    mess_use(message, it_mes, need_log=need_log)
+    await mess_use(message, it_mes, need_log=need_log)
 
 
 # UNMUTE
@@ -241,7 +241,7 @@ async def unmute_command(message: types.Message):
         it_mes = await message.answer(bot_texts.none_rights)
         need_log = False
 
-    mess_use(message, it_mes, need_log=need_log)
+    await mess_use(message, it_mes, need_log=need_log)
 
 
 # HAMMER, List all active ban/mute
