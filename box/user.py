@@ -25,7 +25,7 @@ def get_user(user_id: int) -> user:
                   reput=row[10],
                   messages=row[11],
                   warns=row[12],
-                  warnborn=row[13])
+                  warnborn=datetime.strptime(row[13], "%m/%d/%Y, %H:%M:%S"))
     return l_user
 
 
@@ -78,11 +78,13 @@ def extend_user(user_id: int) -> bool:
 def control_user(from_user) -> None:
     if extend_user(from_user.id):
         it_user = get_user(from_user.id)
+        print(it_user.username)
         it_user.username = from_user.username
         if from_user.last_name is not None:
             it_user.name = from_user.first_name + " " + from_user.last_name
         else:
             it_user.name = from_user.first_name
+        print(it_user.username)
         it_user.update_user()
     else:
         if from_user.last_name is not None:
