@@ -12,6 +12,10 @@ def get_user(user_id: int) -> user:
     conn = engine.connect()
     result = conn.execute(s)
     row = result.fetchone()
+    if row[13] is None:
+        warnborn = None
+    else:
+        warnborn = datetime.strptime(row[13], "%m/%d/%Y, %H:%M:%S")
     l_user = User(user_id=row[0],
                   name=row[1],
                   username=row[2],
@@ -25,7 +29,7 @@ def get_user(user_id: int) -> user:
                   reput=row[10],
                   messages=row[11],
                   warns=row[12],
-                  warnborn=datetime.strptime(row[13], "%m/%d/%Y, %H:%M:%S"))
+                  warnborn=warnborn)
     return l_user
 
 
