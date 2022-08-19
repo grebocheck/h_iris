@@ -264,7 +264,7 @@ async def sadmin(message: types.Message):
     info = message.text.split()
     try:
         if len(info) >= 2:
-            rank = int(info[2])
+            rank = int(info[1])
             if rank in set_rank_list:
                 it_user = get_user(message.reply_to_message.from_user.id)
                 admin = get_user(message.from_user.id)
@@ -293,7 +293,7 @@ async def dadmin(message: types.Message):
                            from_user_id=message.from_user.id)
         if result:
             it_mes = await message.answer(bot_texts.del_admin(it_admin=get_user(message.reply_to_message.from_user.id),
-                                                              from_admin=message.from_user.id))
+                                                              from_admin=get_user(message.from_user.id)))
             await mess_use(message, it_mes, need_log=True)
         else:
             it_mes = await message.answer(bot_texts.none_rights)

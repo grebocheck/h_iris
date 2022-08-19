@@ -99,7 +99,10 @@ def del_admin(user_id, from_user_id) -> bool:
             it_admin = get_admin(user_id)
             it_admin.delete()
             return True
-    return False
+        else:
+            return False
+    else:
+        return False
 
 
 class Admin:
