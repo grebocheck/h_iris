@@ -35,7 +35,7 @@ ham = Table(
 
 admin = Table(
     'admin', meta,
-    Column('user_id', Integer, primary_key=True),
+    Column('user_id', Integer),
     Column('born', String),
     Column('rank', Integer),
 )

@@ -38,6 +38,11 @@ incor_time_mute = "Возможно, неправильно введено вр�
 
 comment_max_warn = "Пользователь получил максимум варнов"
 
+bad_add_admin = "Введите команду коректно /sadmin `число` , где 1-*модер*, 2-*админ*"
+
+its_no_admin = "Выбраный пользователь не обладает правами администатора"
+
+
 time_patterns = {
     'en': {
         'm': ['m', 'min', 'minute', 'minutes'],
@@ -45,6 +50,14 @@ time_patterns = {
         'd': ['d', 'day', 'days'],
     }
 }
+
+
+def del_admin(it_admin, from_admin):
+    return f"{get_username(it_admin)} был лишён прав администатором {get_username(from_admin)}"
+
+
+def set_admin(it_user, rank, admin):
+    return f"{get_username(it_user)} получил администратора {rank} ранга от {get_username(admin)}"
 
 
 def had_warns(it_user, admin):

@@ -9,8 +9,8 @@ from aiogram.utils.exceptions import (MessageToEditNotFound, MessageCantBeEdited
 from bot import bot_texts
 import settings
 from box.user import control_user, get_user, extend_user, get_user_by_name
-from box.hammer import db_ban, db_unban, db_mute, db_unmute, extend_ban, extend_mute, get_ham, get_punish_time, \
-    get_all_ham, clear_mutes
+from box.hammer import db_ban, db_unban, db_mute, db_unmute, get_ham, get_punish_time, get_all_ham, clear_mutes
+from box.admin import guardian, set_admin, del_admin, set_rank_list, extend_admin
 import asyncio
 
 # Configure logging
@@ -77,7 +77,7 @@ async def report_command(message: types.Message):
 @dp.message_handler(lambda message: message.reply_to_message, commands='warn')
 async def warn_command(message: types.Message):
     control_user(message.from_user)
-    if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
+    if guardian(message.from_user.id, settings.LVL_WARN):
         if extend_user(message.reply_to_message.from_user.id):
             it_user = get_user(message.reply_to_message.from_user.id)
             it_user.control_warn()
@@ -107,7 +107,7 @@ async def warn_command(message: types.Message):
 @dp.message_handler(lambda message: message.reply_to_message, commands='unwarn')
 async def unwarn_command(message: types.Message):
     control_user(message.from_user)
-    if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
+    if guardian(message.from_user.id, settings.LVL_UNWARN):
         if extend_user(message.reply_to_message.from_user.id):
             it_user = get_user(message.reply_to_message.from_user.id)
             it_user.control_warn()
@@ -129,7 +129,7 @@ async def unwarn_command(message: types.Message):
 @dp.message_handler(lambda message: message.reply_to_message, commands='ban')
 async def ban_command(message: types.Message):
     control_user(message.from_user)
-    if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
+    if guardian(message.from_user.id, settings.LVL_BAN):
         if extend_user(message.reply_to_message.from_user.id):
             user_to_ban = message.reply_to_message.from_user.id
             comment = message.text[5:]
@@ -155,7 +155,7 @@ async def ban_command(message: types.Message):
 @dp.message_handler(commands='unban')
 async def unban_command(message: types.Message):
     control_user(message.from_user)
-    if message.from_user.id in settings.SUPER_ADMINS:  # первый и высший админ чей id вписан в настройки
+    if guardian(message.from_user.id, settings.LVL_UNBAN):
         name = message.text[7:]
         user_to_unban_pre = get_user_by_name(name)
         if user_to_unban_pre[0]:
@@ -179,7 +179,7 @@ async def unban_command(message: types.Message):
 @dp.message_handler(lambda message: message.reply_to_message, commands='mute')
 async def mute_command(message: types.Message):
     control_user(message.from_user)
-    if message.from_user.id in settings.SUPER_ADMINS:
+    if guardian(message.from_user.id, settings.LVL_MUTE):
         if extend_user(message.reply_to_message.from_user.id):
             user_to_mute = message.reply_to_message.from_user.id
             info = message.text.split()
@@ -215,7 +215,7 @@ async def mute_command(message: types.Message):
 @dp.message_handler(commands='unmute')
 async def unmute_command(message: types.Message):
     control_user(message.from_user)
-    if message.from_user.id in settings.SUPER_ADMINS:
+    if guardian(message.from_user.id, settings.LVL_UNMUTE):
         try:
             name = message.text[8:]
             user_to_unmute_pre = get_user_by_name(name)
@@ -247,7 +247,7 @@ async def unmute_command(message: types.Message):
 # HAMMER, List all active ban/mute
 @dp.message_handler(commands='hammer')
 async def hammer(message: types.Message):
-    if message.from_user.id in settings.SUPER_ADMINS:
+    if guardian(message.from_user.id, settings.LVL_HAMER_LIST):
         clear_mutes()
         ham_list = get_all_ham()
         it_mes = await message.answer(bot_texts.all_hams(ham_list))
@@ -256,6 +256,51 @@ async def hammer(message: types.Message):
             await message.delete()
         if settings.AUTO_DELETE:
             asyncio.create_task(delete_message(it_mes, 60))
+
+
+# SET_ADMIN
+@dp.message_handler(lambda message: message.reply_to_message, commands='sadmin')
+async def sadmin(message: types.Message):
+    info = message.text.split()
+    try:
+        if len(info) >= 2:
+            rank = int(info[2])
+            if rank in set_rank_list:
+                it_user = get_user(message.reply_to_message.from_user.id)
+                admin = get_user(message.from_user.id)
+                result = set_admin(user_id=message.reply_to_message.from_user.id,
+                                   rank=rank,
+                                   from_user_id=message.from_user.id)
+                if result:
+                    it_mes = await message.answer(bot_texts.set_admin(it_user=it_user, rank=rank, admin=admin))
+                    await mess_use(message, it_mes, need_log=True)
+                else:
+                    it_mes = await message.answer(bot_texts.none_rights)
+                    await mess_use(message, it_mes)
+            else:
+                it_mes = await message.answer(bot_texts.bad_add_admin)
+                await mess_use(message, it_mes)
+    except ValueError:
+        it_mes = await message.answer(bot_texts.bad_add_admin)
+        await mess_use(message, it_mes)
+
+
+# DEL_ADMIN
+@dp.message_handler(lambda message: message.reply_to_message, commands='dadmin')
+async def dadmin(message: types.Message):
+    if extend_admin(user_id=message.reply_to_message.from_user.id):
+        result = del_admin(user_id=message.reply_to_message.from_user.id,
+                           from_user_id=message.from_user.id)
+        if result:
+            it_mes = await message.answer(bot_texts.del_admin(it_admin=get_user(message.reply_to_message.from_user.id),
+                                                              from_admin=message.from_user.id))
+            await mess_use(message, it_mes, need_log=True)
+        else:
+            it_mes = await message.answer(bot_texts.none_rights)
+            await mess_use(message, it_mes)
+    else:
+        it_mes = await message.answer(bot_texts.its_no_admin)
+        await mess_use(message, it_mes)
 
 
 # BAD PHRASE FILTER
@@ -289,7 +334,7 @@ async def carma(message: types.Message):
     await echo(message)
 
 
-# ANOTHER
+# OTHER
 @dp.message_handler(content_types=[ContentType.TEXT, ContentType.VIDEO, ContentType.VOICE,
                                    ContentType.AUDIO, ContentType.PHOTO, ContentType.ANIMATION,
                                    ContentType.STICKER, ContentType.VIDEO_NOTE])
